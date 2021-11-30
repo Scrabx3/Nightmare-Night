@@ -1,0 +1,28 @@
+$NN_pConfig
+
+$NN_LunarTransformation	Lunar Transformation
+$NN_LunarPreset_0	Warg
+$NN_LunarPreset_1	Skinwalker
+$NN_LunarPreset_2	Cursed Blood
+$NN_LunarPreset_3	Custom
+$NN_LunarPreset	Lunar Preset
+$NN_LunarPresetHighlight	Choose a Preset to customize the probability of Lunar Transformations.\nThe "Custom" Preset allows you to customize the Chances manually.
+
+$NN_LunarChance_0	Full Moon (Whole)
+$NN_LunarChance_1	Waning Gibbous
+$NN_LunarChance_2	Second Quarter
+$NN_LunarChance_3	Waning Cresent
+$NN_LunarChance_4	New Moon
+$NN_LunarChance_5	Waxing Cresent
+$NN_LunarChance_6	First Quarter
+$NN_LunarChance_7	Waxing Gibbous
+$NN_LunarChance_8	Full Moon (Fragment)
+$NN_LunarChanceHighlight_0	Chance for a Lunar Transformation during a Full Moon.\n"Whole" is the second day of the Moon's 3-day Period.
+$NN_LunarChanceHighlight_1	Chance for a Lunar Transformation during "Waning Gibbous".
+$NN_LunarChanceHighlight_2	Chance for a Lunar Transformation during "Second Quarter".
+$NN_LunarChanceHighlight_3	Chance for a Lunar Transformation during "Waning Cresent".
+$NN_LunarChanceHighlight_4	Chance for a Lunar Transformation during a New Moon.
+$NN_LunarChanceHighlight_5	Chance for a Lunar Transformation during "Waxing Cresent".
+$NN_LunarChanceHighlight_6	Chance for a Lunar Transformation during "First Quarter".
+$NN_LunarChanceHighlight_7	Chance for a Lunar Transformation during "Waxing Gibbous".
+$NN_LunarChanceHighlight_8	Chance for a Lunar Transformation during a fragmented Full Moon.\n"Fragmented" is the first and third day of the Full Moon's 3-day Period.
