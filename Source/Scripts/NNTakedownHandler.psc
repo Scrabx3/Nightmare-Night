@@ -19,8 +19,6 @@ Message Property DLC1FeedPointsMsg Auto
 Message Property DLC1WerewolfPerkEarned Auto
 
 
-
-
 Actor me ; I cache this cause bad experiences with GetTargetActor() returning none after said target Actor dies, idk
 Event OnEffectStart(Actor akTarget, Actor akCaster)
   me = akTarget
@@ -34,9 +32,22 @@ Event OnDying(Actor akKiller)
   EndIf
   ;/ =======================================
     XP System
-    TODO: Implement me
+    Vanilla Xp Function is [5+2x] with x <= 11 -> 168 Feedings total
+    Nightmare Night Xp Function will be [5+x] with x <= 35 -> 770 Kills total
+    Consider that Killing is faster and easier to do than Feeding, I believe that despite the significant increase in required Points to collect, time spend on obtaining a new Perk wont be all too different to Vanilla
   ======================================= /;
-
+  If(DLC1WerewolfTotalPerksEarned.Value < DLC1WerewolfMaxPerks.Value)
+    DLC1WerewolfFeedPoints.Value += 1
+    ; DLC1FeedPointsMsg.Show()
+    If(DLC1WerewolfNextPerk.Value <= DLC1WerewolfFeedPoints.Value)
+      DLC1WerewolfFeedPoints.Value -= DLC1WerewolfNextPerk.Value
+      DLC1WerewolfPerkPoints.Value += 1
+      DLC1WerewolfTotalPerksEarned.Value += 1
+      DLC1WerewolfNextPerk.Value += 1 ; DLC1WerewolfNextPerk.Value + 2
+      DLC1WerewolfPerkEarned.Show()
+      Debug.Trace("NIGHTMARE NIGHT: New perk (Feed points " + DLC1WerewolfFeedPoints.Value +", Next perk " + DLC1WerewolfNextPerk.Value + ", Perk pionts " + DLC1WerewolfPerkPoints.value + ")")
+    EndIf
+  EndIf
 
   ;/ =======================================
     Blood Frenzy is a Buff the Player stacks whenever they kill something

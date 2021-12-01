@@ -10,11 +10,6 @@ Scriptname PlayerWerewolfChangeScript extends Quest
 4) Setting Stage100 will end the Transformation
 /;
 
-
-; TODO: Think about Healing Scaling & Perks
-; TODO: Think about Hunger Stages Effects
-; TODO: Implement Perks
-; TODO: Cobweb Destruction Effect
 ; TODO: 3/6 Spirit Prey
 
 ; =============================== VANILLA PROPERTIES
@@ -54,6 +49,15 @@ Idle Property SpecialFeeding auto
 
 Quest Property C03Rampage auto
 
+Spell Property PlayerWerewolfLvl10AndBelowAbility auto
+Spell Property PlayerWerewolfLvl15AndBelowAbility auto
+Spell Property PlayerWerewolfLvl20AndBelowAbility auto
+Spell Property PlayerWerewolfLvl25AndBelowAbility auto
+Spell Property PlayerWerewolfLvl30AndBelowAbility auto
+Spell Property PlayerWerewolfLvl35AndBelowAbility auto
+Spell Property PlayerWerewolfLvl40AndBelowAbility auto
+Spell Property PlayerWerewolfLvl45AndBelowAbility auto
+Spell Property PlayerWerewolfLvl50AndOverAbility auto
 
 Spell Property FeedBoost auto
 Spell property BleedingFXSpell auto
@@ -90,6 +94,14 @@ GlobalVariable Property DLC1WerewolfMaxPerks Auto
 ; =============================== NIGHTMARE NIGHT PROPERTIES
 NNLunarTransform Property Lunar Auto
 GlobalVariable Property LunarPhase Auto
+Message Property LunarExtendTime Auto
+
+GlobalVariable Property IsWerewolf Auto
+Race Property DLC2WerebearRace Auto
+Armor Property BearSkinFXArmor Auto
+
+Keyword Property NightmareRequiem Auto
+Spell Property NightmaresRequiemDispel Auto
 
 DefaultObjectManager DefObjMananager
 Form RIWR ; Werewolf Race
@@ -124,8 +136,12 @@ Keyword Property FrenzyKeyword Auto
 Spell[] Property BloodFrenzy Auto
 Spell Property FrenzyLv0 Auto
 
+Spell Property DestroyObjSpell Auto
+
 Shout LastEquippedShout
 Spell LastEquippedPower
+
+Race PlayerRace
 
 ; =============================================================
 ; =============================== UTILITY
@@ -143,16 +159,25 @@ EndFunction
 ; =============================================================
 ; =============================== TRANSFORMATION
 ; =============================================================
-; Called on Quest Start (e.g. when WW Transform is called)
+; Called on Quest Start (read: when WW Transform is called)
 Function PrepShift()
   ; Debug.Trace("WEREWOLF: Prepping shift...")
+  ; Cache Race..
+  Actor Player = Game.GetPlayer()
+  PlayerRace = Player.GetRace()
+  ; Debug.Trace("NIGHTMARE NIGHT - Player Original Race = " + PlayerRace)
   ; Set up Default Object Manager Objects..
   DefObjMananager = Game.GetFormFromFile(0x00000031, "Skyrim.esm") as DefaultObjectManager
-  RIWR = DefObjMananager.GetForm("RIWR")
-  RIVR = DefObjMananager.GetForm("RIVR")
-  RIVS = DefObjMananager.GetForm("RIVS")
-
-  Actor Player = Game.GetPlayer()
+  RIWR = DefObjMananager.GetForm("RIWR") ; Werewolf Race
+  RIVR = DefObjMananager.GetForm("RIVR") ; Vampire Race
+  RIVS = DefObjMananager.GetForm("RIVS") ; Vampire Spells
+  If(IsWerewolf.Value == 1)
+    DefObjMananager.SetForm("RIVR", WerewolfBeastRace)
+  Else
+    DefObjMananager.SetForm("RIWR", DLC2WerebearRace)
+    DefObjMananager.SetForm("RIVR", DLC2WerebearRace)
+  EndIf
+  DefObjMananager.SetForm("RIVS", WerewolfAbilities)
 
   ; sets up the UI restrictions
   Game.SetBeastForm(True)
@@ -165,6 +190,11 @@ Function PrepShift()
   ; screen effect
   WerewolfChange.Apply()
   WerewolfIMODSound.Play(Player)
+
+  ; end Nightmares Requiem if running
+  If(Player.HasMagicEffectWithKeyword(NightmareRequiem))
+    NightmaresRequiemDispel.Cast(Player)
+  EndIf
 
   ; get rid of your summons
   int count = 0
@@ -184,13 +214,17 @@ EndFunction
 ; Called from Stage1 (e.g. when Transform Script completes)
 Function InitialShift()
   ; Debug.Trace("WEREWOLF: Player beginning transformation.")
-  WerewolfWarn.Apply() 
+  WerewolfWarn.Apply()
   if (Game.GetPlayer().IsDead())
     ; Debug.Trace("WEREWOLF: Player is dead; bailing out.")
     return
   endif
   ; actual switch
-  Game.GetPlayer().SetRace(WerewolfBeastRace)
+  If(IsWerewolf.Value == 1)
+    Game.GetPlayer().SetRace(WerewolfBeastRace)
+  Else
+    Game.GetPlayer().SetRace(DLC2WerebearRace)
+  EndIf
 EndFunction
 
 ; Called when the Race is fully donw switching
@@ -205,7 +239,11 @@ Function StartTracking()
   ; take all the player's stuff (since he/she can't use it anyway)
   ; Game.GetPlayer().RemoveAllItems(LycanStash)
   Player.UnequipAll()
-  Player.EquipItem(WolfSkinFXArmor, False, True)
+  If(IsWerewolf.Value == 1)
+    Player.EquipItem(WolfSkinFXArmor, False, True)
+  Else
+    Player.EquipItem(BearSkinFXArmor, False, True)
+  EndIf
 
   ; Add Blood Effects
   ; FeedBloodVFX.Play(Game.GetPlayer())
@@ -261,11 +299,7 @@ Function StartTracking()
   endif
 
   ; but make up for it by giving you the sweet howl
-  ; Totem Buffs are handled by a new Global. We no logner need the Companion Variables here
-  ; set up the definitely not hacky Favorites Menu here instead of equipping a single Howl. Also equip the last used Howl :)
-  DefObjMananager.SetForm("RIVR", WerewolfBeastRace)
-  DefObjMananager.SetForm("RIVS", WerewolfAbilities)
-
+  ; Totem Buffs are handled by a new Global. We no logner need the Companion Variables here, still want to add the shouts though I guess
   Player.AddShout(HowlTerror)
   Game.UnlockWord(HowlTerrorWord1)
   Game.UnlockWord(HowlTerrorWord2)
@@ -281,13 +315,13 @@ Function StartTracking()
   ; Game.UnlockWord(HowlLiftDetectWord2)
   ; Game.UnlockWord(HowlLiftDetectWord3)
 
+  ; if the player had a power or shout equipped beforre transforming back, do them a favor and equip it back on :>
   If(LastEquippedShout != none)
     Player.EquipShout(LastEquippedShout)
   ElseIf(LastEquippedPower != none)
     Player.EquipSpell(LastEquippedPower, 2)
   EndIf
 
-  ; TODO: Resort this to use an Array & extend Scaling to Lv100
   ; and some rad claws
   int playerLevel = Player.GetLevel()
   if (playerLevel <= 10)
@@ -310,7 +344,7 @@ Function StartTracking()
     Player.AddSpell(PlayerWerewolfLvl50AndOverAbility, false)
   endif
 
-  ; set moonphase
+  ; set moonphase for Nightmare Passives
   float g = GameDaysPassed.Value
   g = (g - g as int) * 24
   If(g < 19.00 && g > 5.00)
@@ -318,16 +352,6 @@ Function StartTracking()
   Else
     LunarPhase.Value = Lunar.GetMoonPhase() as int
   EndIf
-
-  ;/ !IMPORTANT
-  - Precision unreliable?
-  - Nightmare Requiem no worki
-
-  - Check on predator vision nightvision
-
-  - Check Frenzy Stacking
-  - No Escape no worki
-  /;
 
   ; COMEBACK: Perks that influence this timer should be noted here
   ; calculate when the player turns back into a pumpkin
@@ -345,8 +369,8 @@ Function StartTracking()
     regressTime = currentTime + RealTimeSecondsToGameTimeDays(StandardDurationSeconds)
   EndIf
   PlayerWerewolfShiftBackTime.SetValue(regressTime)
-  Debug.Trace("NIGHTMARE NIGHT - WEREWOLF: Current day -- " + currentTime)
-  Debug.Trace("NIGHTMARE NIGHT - WEREWOLF: Player will turn back at day " + regressTime)
+  ; Debug.Trace("NIGHTMARE NIGHT - WEREWOLF: Current day -- " + currentTime)
+  ; Debug.Trace("NIGHTMARE NIGHT - WEREWOLF: Player will turn back at day " + regressTime)
 
   ; increment stats
   Game.IncrementStat("Werewolf Transformations")
@@ -359,6 +383,9 @@ Function StartTracking()
     FrenzyStacks.Value = 5
     BloodFrenzy[4].Cast(Player)
   EndIf
+  ; and quick spell for destroying webs..
+  RegisterForAnimationEvent(Player, "WeaponSwing")
+  RegisterForAnimationEvent(Player, "WeaponLeftSwing")
 EndFunction
 
 ; =============================================================
@@ -368,7 +395,7 @@ EndFunction
 Event OnUpdate()
   Actor Player = Game.GetPlayer()
   If(!Player.HasMagicEffectWithKeyword(FrenzyKeyword))
-    Debug.Trace("NIGHTMARE NIGHT: Resetting Frenzy Tick -- Level = " + FrenzyStacks.Value)
+    ; Debug.Trace("NIGHTMARE NIGHT: Resetting Frenzy Tick -- Level = " + FrenzyStacks.Value)
     FrenzyStacks.Value = 0
   ElseIf(Player.HasPerk(Wrath))
     return
@@ -378,7 +405,7 @@ Event OnUpdate()
     return
   EndIf
   ; Debug.Trace("WEREWOLF: NumWerewolfPerks = " + Game.QueryStat("NumWerewolfPerks"))
-  If(Game.QueryStat("NumWerewolfPerks") >= DLC1WerewolfMaxPerks.Value) ; !IMPORTANT TODO: UPDATE THIS STAT !IMPORTANT
+  If(Game.QueryStat("NumWerewolfPerks") >= DLC1WerewolfMaxPerks.Value) ; !IMPORTANT keep this Stat updated
     ; debug.trace("WEREWOLF: achievement granted")
     ; Game.AddAchievement(57)
   EndIf
@@ -404,6 +431,28 @@ Function SetUntimed(bool untimedValue)
   endif
 EndFunction
 
+; The Default Object Manager Objects are apparently resettet after a Gameload
+; I guess thats a good thing but we dont want that to happen while still transformed
+Function PlayerReloadGame()
+  DefObjMananager.SetForm("RIVR", WerewolfBeastRace)
+  DefObjMananager.SetForm("RIVS", WerewolfAbilities)
+EndFunction
+
+; Called by Lunar Transform if were shifted while a Lunar Shift triggers. Extending duration of the Shift till dawn
+Function ExtendToDawn()
+  float currentTime = GameDaysPassed.GetValue()
+  float fiveam = 5/24
+  float regressTime = (currentTime as int) + fiveam
+  If(currentTime - currentTime as int > fiveam)
+    ; If still one the previous day, increase timer by 1
+    regressTime += 1
+  EndIf
+  PlayerWerewolfShiftBackTime.SetValue(regressTime)
+  LunarExtendTime.Show()
+  Debug.Trace("NIGHTMARE NIGHT - WEREWOLF: Current day -- " + currentTime)
+  Debug.Trace("NIGHTMARE NIGHT - WEREWOLF: Player will turn back at day " + regressTime)
+EndFunction
+
 ;/ =======================================
   In NN, feeding Restores Health, extends Transformation Time(?)
   and Sates
@@ -417,10 +466,9 @@ Function Feed(Actor victim)
   BleedingFXSpell.Cast(victim, victim)
   ; Extend Transformation Time
   If(!C03Rampage.IsRunning())
-    float hunger = HungerLevel.GetValueInt() + 1
-    float addShiftTime = __feedExtensionTime * hunger
+    float addShiftTime = __feedExtensionTime
     If(player.HasPerk(DLC1GorgingPerk))
-      addShiftTime += __GorgeExtensionTime * hunger
+      addShiftTime += __GorgeExtensionTime
     EndIf
     If(!victim.HasKeyword(ActorTypeNPC))
       Debug.Trace("NIGHTMARE NIGHT - Feeding on Creature, cutting Transformation Time Gain in Half")
@@ -470,6 +518,8 @@ EndFunction
 Event OnAnimationEvent(ObjectReference akSource, string asEventName)
   if (asEventName == "TransformToHuman")
     ActuallyShiftBackIfNecessary()
+  ElseIf(asEventName == "WeaponSwing") || (asEventName == "WeaponLeftSwing")
+    DestroyObjSpell.Cast(Game.GetPlayer())
   endif
 EndEvent
 
@@ -519,24 +569,26 @@ Function ActuallyShiftBackIfNecessary()
   ; make sure your health is reasonable before turning you back
   ; Game.GetPlayer().GetActorBase().SetInvulnerable(true)
   Player.SetGhost()
-  float currHealth = Player.GetAV("health")
-  if (currHealth <= 101)
+  float currHealth = Player.GetActorValue("health")
+  float minHealth = 150.0 + (150 * Player.HasPerk(NightmareNight) as int)
+  if (currHealth <= minHealth)
     ; Debug.Trace("WEREWOLF: Player's health is only " + currHealth + "; restoring.")
-    Player.RestoreAV("health", 101 - currHealth)
+    Player.RestoreAV("health", minHealth - currHealth)
   endif
 
   ; change you back
   ; Debug.Trace("WEREWOLF: Setting race " + (CompanionsTrackingQuest as CompanionsHousekeepingScript).PlayerOriginalRace + " on " + Game.GetPlayer())
-  Player.SetRace((CompanionsTrackingQuest as CompanionsHousekeepingScript).PlayerOriginalRace)
+  ; Player.SetRace((CompanionsTrackingQuest as CompanionsHousekeepingScript).PlayerOriginalRace)
+  Player.SetRace(PlayerRace)
   ; release the player controls
   ; Debug.Trace("WEREWOLF: Restoring camera controls")
   Game.EnablePlayerControls(abMovement = false, abFighting = false, abCamSwitch = true, abLooking = false, abSneaking = false, abMenu = false, abActivate = false, abJournalTabs = false, aiDisablePOVType = 1)
   Game.ShowFirstPersonGeometry(true)
 
   ; Reset the Hack into the Vampire Ability Menu
-	DefObjMananager.SetForm("RIWR", RIWR)
-	DefObjMananager.SetForm("RIVR", RIVR)
-	DefObjMananager.SetForm("RIVS", RIVS)
+	DefObjMananager.SetForm("RIWR", RIWR) ; Werewolf Race
+	DefObjMananager.SetForm("RIVR", RIVR) ; Vampire Race
+	DefObjMananager.SetForm("RIVS", RIVS) ; Vampire Spells
 
   ; cache currently equipped shout (lil QoL)
   LastEquippedShout = Player.GetEquippedShout()
@@ -615,15 +667,6 @@ Shout Property CurrentHowl auto
 WordOfPower Property CurrentHowlWord1 auto
 WordOfPower Property CurrentHowlWord2 auto
 WordOfPower Property CurrentHowlWord3 auto
-Spell Property PlayerWerewolfLvl10AndBelowAbility auto
-Spell Property PlayerWerewolfLvl15AndBelowAbility auto
-Spell Property PlayerWerewolfLvl20AndBelowAbility auto
-Spell Property PlayerWerewolfLvl25AndBelowAbility auto
-Spell Property PlayerWerewolfLvl30AndBelowAbility auto
-Spell Property PlayerWerewolfLvl35AndBelowAbility auto
-Spell Property PlayerWerewolfLvl40AndBelowAbility auto
-Spell Property PlayerWerewolfLvl45AndBelowAbility auto
-Spell Property PlayerWerewolfLvl50AndOverAbility auto
 
 
 ;/ =======================================

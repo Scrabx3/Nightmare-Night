@@ -2,6 +2,7 @@ Scriptname NNLunarTransform extends Quest
 {Main Cycle Script for Hunger & Lunar Transformation}
 
 NNMCM Property MCM Auto
+PlayerWerewolfChangeScript Property WWQ Auto
 
 GlobalVariable Property GameHour Auto
 GlobalVariable Property GameDaysPassed Auto
@@ -16,6 +17,8 @@ ImageSpaceModifier Property LunarTransformFlashImod Auto
 ImageSpaceModifier[] Property LunarTransformWarnImod Auto
 Spell Property LunarTransformSpell Auto
 
+Keyword Property WerebeastKeyword Auto
+
 bool Property LunarTransform Auto Hidden
 
 
@@ -23,19 +26,18 @@ Event OnUpdateGameTime()
   Debug.MessageBox("NIGHTMARE NIGHT - Update Game Time")
   float g = GameHour.Value
 
-  float daysPassed = GameDaysPassed.Value
-  float hoursTillHunger = ((HungerLastFeed.Value + 1) - daysPassed) * 24
-
-  If(hoursTillHunger <= 0)
-    If(HungerLevel.Value > 0)
-      HungerLevel.Value -= 1
-      ManageHunger()
-    Else
-      HungerFeedings.Value = 0
-    EndIf
-    HungerLastFeed.Value = daysPassed
-    hoursTillHunger = 24
-  EndIf
+  ; float daysPassed = GameDaysPassed.Value
+  ; float hoursTillHunger = ((HungerLastFeed.Value + 1) - daysPassed) * 24
+  ; If(hoursTillHunger <= 0)
+  ;   If(HungerLevel.Value > 0)
+  ;     HungerLevel.Value -= 1
+  ;     ManageHunger()
+  ;   Else
+  ;     HungerFeedings.Value = 0
+  ;   EndIf
+  ;   HungerLastFeed.Value = daysPassed
+  ;   hoursTillHunger = 24
+  ; EndIf
 
   If(g >= 19.00 || g < 1.00)
     float moonphase = GetMoonphase()
@@ -47,7 +49,12 @@ Event OnUpdateGameTime()
     MoonPhaseNotifies[moonphaseINT].Show()
     If(Utility.RandomFloat(0, 99.9) < MCM.LunarChances[moonphaseINT])
       UnregisterForUpdateGameTime()
-      GoToState("Transform")
+      ; Dont transform if were already shifted..
+      If(Game.GetPlayer().HasKeyword(WerebeastKeyword))
+
+      Else
+        GoToState("Transform")
+      EndIf
       return ; next Update is handled by Werewolf Quest
     EndIf
   EndIf
@@ -55,12 +62,13 @@ Event OnUpdateGameTime()
   float hoursTillNight = 19.0 - g
   If(hoursTillNight <= 0)
     hoursTillNight = 24.0 + hoursTillNight
-  EndIf
-  If(hoursTillHunger < hoursTillNight)
-    RegisterForSingleUpdateGameTime(hoursTillHunger)
-  Else
     RegisterForSingleUpdateGameTime(hoursTillNight)
   EndIf
+  ; If(hoursTillHunger < hoursTillNight)
+  ;   RegisterForSingleUpdateGameTime(hoursTillHunger)
+  ; Else
+  ;   RegisterForSingleUpdateGameTime(hoursTillNight)
+  ; EndIf
 EndEvent
 
 State Transform
@@ -70,12 +78,12 @@ State Transform
     fg = Utility.RandomFloat(fg, fg + 1.0)
     ; Update will be somewhere within the next full hour (e.g. if cur time 19.xx transform is between 20.00 and 21.00)
     RegisterForSingleUpdateGameTime(fg)
-    Debug.MessageBox("NIGHTMARE NIGHT - Update in " + fg)
+    ; Debug.MessageBox("NIGHTMARE NIGHT - Update in " + fg)
   EndEvent
 
   Event OnUpdateGameTime()
     LunarTransform = true
-    int imod = HungerLevel.GetValueInt()
+    int imod = 2 ; HungerLevel.GetValueInt()
     ;/ All Imods have a Rampup time which is dependend on the Hunger Stage which colors the Screen dark red over time
       After the Initial Rampup time theres a 1.5s delay for a quick Flash which stays active for 0.8. During this time
       the color will fade into a greyish black. Over the following 2.5 seconds the Imod will fade out and dispel
@@ -85,8 +93,8 @@ State Transform
     float time
     If(imod == 0) ; - ; 5.2 (Total Dur: 10)
       time = 4.5
-    ElseIf(imod == 1) ; 12.6 (Total Dur: 18)
-      time = 11.9
+    ElseIf(imod == 1) ; 13.2 (Total Dur: 18)
+      time = 12.5
     ElseIf(imod == 2) ; 21.2 (Total Dur: 26)
       time = 20.5
     Else ; ---------- ; 28.2 (Total Dur: 33)
@@ -101,11 +109,28 @@ State Transform
 EndState
 
 ;/ =======================================
+  Hunger System; For every so and so many Feedings gain a few buffs or debuffs. This essentially mimics the Vampire Thirst System.. just different
+  Hunger defines the warn time before a Lunar Transformation happens and includes the following Buffs & Debuffs:
+  === Stage 0
+  Disease Resistance -100% (negated)
+  -50 Max Stamina
+
+  === Stage 1
+  Disease Resistance -50%
+
+  === Stage 2
+
+  === Stage 3
+  +10% Movement Speed in and out of beastform
 
 ======================================= /;
 Function ManageHunger()
-  int stage = HungerLevel.GetValueInt()
+  ; int stage = HungerLevel.GetValueInt()
   ; TODO: define Hunger Stages here
+  ; NOTE: prbly not going to implement this due to NNs dynamic usually trying to punish you for feeding 
+  ; .. which contradicts with the Hunger Systems attempt to force you into feeding
+  ; Im also not sure what exactly to do with it. I want to avoid exclusively granting Stat Buffs & Debuffs everywhere
+  ; But since Werebeasts have no access to magic or any other traits beyond "incredible physical strength" my options here are somewhat limited
 EndFunction
 
 ;/ =======================================

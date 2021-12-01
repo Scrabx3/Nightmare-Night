@@ -12,41 +12,38 @@ Sound Property NPCWerewolfTransformationB3D auto
 Quest Property PlayerWerewolfQuest auto
 
 Event OnEffectStart(Actor Target, Actor Caster)
-;     Debug.Trace("WEREWOLF: Starting change anim...")
+	; Debug.Trace("WEREWOLF: Starting change anim...")
 
-    if (Target.GetActorBase().GetRace() != WerewolfRace)
+  if (Target.GetActorBase().GetRace() != WerewolfRace)
 		; Add the tranformation wolf skin Armor effect 
 		Target.equipitem(WolfSkinFXArmor,False,True)
-		
-        RegisterForAnimationEvent(Target, "SetRace")
-        Target.PlayIdle(IdleWerewolfTransformation)
-        Utility.Wait(10)
-        TransformIfNecessary(Target)
-    endif
+		RegisterForAnimationEvent(Target, "SetRace")
+    Target.PlayIdle(IdleWerewolfTransformation)
+    Utility.Wait(10)
+    TransformIfNecessary(Target)
+  endif
 EndEvent
 
 Event OnAnimationEvent(ObjectReference akSource, string asEventName)
-;     Debug.Trace("WEREWOLF: Getting anim event -- " + akSource + " " + asEventName)
-    if (asEventName == "SetRace")
-        TransformIfNecessary(akSource as Actor)
-    endif
+	; Debug.Trace("WEREWOLF: Getting anim event -- " + akSource + " " + asEventName)
+  if (asEventName == "SetRace")
+    TransformIfNecessary(akSource as Actor)
+  endif
 EndEvent
 
 Function TransformIfNecessary(Actor Target)
 	if (Target == None)
-; 		Debug.Trace("WEREWOLF: Trying to transform something that's not an actor; bailing out.", 2)
+		;	Debug.Trace("WEREWOLF: Trying to transform something that's not an actor; bailing out.", 2)
 		return
 	endif
-
 	UnRegisterForAnimationEvent(Target, "SetRace")
 
 	Race currRace = Target.GetRace()
 	if (currRace != WerewolfRace)
-; 		Debug.Trace("WEREWOLF: VISUAL: Setting race " + WerewolfRace + " on " + Target)
+		Debug.Trace("WEREWOLF: VISUAL: Setting race " + WerewolfRace + " on " + Target)
 		if (Target != Game.GetPlayer())
-; 			Debug.Trace("WEREWOLF: VISUAL: Target is not player, doing the transition here.")
+			; Debug.Trace("WEREWOLF: VISUAL: Target is not player, doing the transition here.")
 			Target.SetRace(WerewolfRace) ;TEEN WOLF
-			
 			; Remove the transformation effect armor if he/she has it on.
 			if (Target.GetItemCount(WolfSkinFXArmor) > 0) 
 				(Target.Removeitem(WolfSkinFXArmor, 1, True, none))
@@ -57,9 +54,8 @@ Function TransformIfNecessary(Actor Target)
 				chs.PlayerOriginalRace = currRace
 			endif
 			PlayerWerewolfQuest.SetStage(1)
-        endif
-		
     endif
+  endif
 EndFunction
 
 

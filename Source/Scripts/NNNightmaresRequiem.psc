@@ -10,6 +10,10 @@ GlobalVariable Property FrenzyStacks Auto
 Keyword Property BloodFrenzyKW Auto
 Perk Property Wrath Auto
 
+ImageSpaceModifier Property NightmareRequiemIntroImod Auto
+ImageSpaceModifier Property NightmareRequiemImod Auto
+ImageSpaceModifier Property NightmareRequiemOutroImot Auto
+
 ;/ =======================================
   Nightmares Requiem
   This is supposed to be some kind of "inbetween" Lycan Transformation. This Script acts as the
@@ -20,12 +24,15 @@ Event OnEffectStart(Actor akTarget, Actor akCaster)
   ; Game.SetBeastForm(True)
   Game.EnableFastTravel(False)
   Game.DisablePlayerControls(abMovement = false, abFighting = false, abCamSwitch = true, abMenu = false, abActivate = false, abJournalTabs = false, aiDisablePOVType = 0)
+  NightmareRequiemIntroImod.Apply()
+  Utility.Wait(0.5)
+  NightmareRequiemIntroImod.PopTo(NightmareRequiemImod)
   ; Inherit WW Abilities
   akTarget.AddSpell(RequiemDispel)
   akTarget.EquipSpell(RequiemDispel, 2)
   int i = 0
   While(i < WWAbilities.Length)
-    akTarget.AddSpell(WWAbilities[i])
+    akTarget.AddSpell(WWAbilities[i], false)
     i += 1
   EndWhile
 
@@ -84,6 +91,7 @@ Event OnEffectFinish(Actor akTarget, Actor akCaster)
   EndWhile
 
   ; misc stuff
+  NightmareRequiemImod.PopTo(NightmareRequiemOutroImot)
   Game.EnableFastTravel(true)
   Game.EnablePlayerControls()
 EndEvent
