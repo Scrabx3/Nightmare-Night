@@ -1,5 +1,9 @@
 Scriptname WerewolfTransformVisual extends ActiveMagicEffect  
 
+NNMCM Property MCM Auto
+Formlist Property WerebearSkinFXs Auto
+Formlist Property WerewolfSkinFXs Auto
+
 Armor Property WolfSkinFXArmor auto
 Race Property WerewolfRace auto
 
@@ -11,12 +15,32 @@ Sound Property NPCWerewolfTransformationB3D auto
 
 Quest Property PlayerWerewolfQuest auto
 
+Form equippedFX
+
 Event OnEffectStart(Actor Target, Actor Caster)
 	; Debug.Trace("WEREWOLF: Starting change anim...")
 
   if (Target.GetActorBase().GetRace() != WerewolfRace)
 		; Add the tranformation wolf skin Armor effect 
-		Target.equipitem(WolfSkinFXArmor,False,True)
+		If(MCM.IsWerewolf.Value == 1)
+			; If(MCM.WolfIndex == 0) ; Vanilla
+				Target.equipitem(WolfSkinFXArmor,False,True)
+				equippedFX = WolfSkinFXArmor
+			; Else
+			; 	Form skinFXArmor = WerewolfSkinFXs.GetAt(MCM.WolfIndex - 1)
+			; 	Target.equipitem(skinFXArmor,False,True)
+			; 	equippedFX = skinFXArmor
+			; EndIf
+		Else
+			If(MCM.BearIndex == 0) ; Vanilla
+				Target.equipitem(WolfSkinFXArmor,False,True)
+				equippedFX = WolfSkinFXArmor
+			Else
+				Form skinFXArmor = WerebearSkinFXs.GetAt(MCM.BearIndex - 1)
+				Target.equipitem(skinFXArmor,False,True)
+				equippedFX = skinFXArmor
+			EndIf
+		EndIf
 		RegisterForAnimationEvent(Target, "SetRace")
     Target.PlayIdle(IdleWerewolfTransformation)
     Utility.Wait(10)
@@ -45,15 +69,17 @@ Function TransformIfNecessary(Actor Target)
 			; Debug.Trace("WEREWOLF: VISUAL: Target is not player, doing the transition here.")
 			Target.SetRace(WerewolfRace) ;TEEN WOLF
 			; Remove the transformation effect armor if he/she has it on.
-			if (Target.GetItemCount(WolfSkinFXArmor) > 0) 
-				(Target.Removeitem(WolfSkinFXArmor, 1, True, none))
+			if (Target.GetItemCount(equippedFX) > 0) 
+				(Target.Removeitem(equippedFX, 1, True, none))
 			endif
 		else
-			CompanionsHousekeepingScript chs = (PlayerWerewolfQuest as PlayerWerewolfChangeScript).CompanionsTrackingQuest as CompanionsHousekeepingScript
+			PlayerWerewolfChangeScript WWQ = PlayerWerewolfQuest as PlayerWerewolfChangeScript
+			CompanionsHousekeepingScript chs = WWQ.CompanionsTrackingQuest as CompanionsHousekeepingScript
 			if (chs.PlayerOriginalRace == None)
 				chs.PlayerOriginalRace = currRace
 			endif
 			PlayerWerewolfQuest.SetStage(1)
+			WWQ.TransitionArmor = equippedFX
     endif
   endif
 EndFunction

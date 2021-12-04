@@ -1,9 +1,35 @@
 Scriptname NNMCM extends SKI_ConfigBase  
 
+Faction Property NightmareNightFaction Auto
+Faction Property WerewolfFaction Auto
+Faction Property WolfFaction Auto
+
+PlayerVampireQuestScript Property VampireQ Auto
+Keyword Property Vampire Auto
+GlobalVariable Property PlayerIsWerewolf Auto ; Vanilla Flag
+GlobalVariable Property IsWerewolf Auto ; Wolf or Bear?
+Spell Property WerewolfTransform Auto
+Spell Property WerewolfImmunity Auto
+Spell Property CureDiseases Auto
+
+GlobalVariable Property WerewolfPerks Auto
+Perk[] Property VanillaPerks Auto
+
 ; -- General
-String[] WolfkinList
-int wolfkinIndex = 1
+bool bWolfkinAlliance = false
+bool Property bTurnBackAnimation = true Auto Hidden
+bool Property bTurnBackStagger = false Auto Hidden
+bool Property bTurnBackNude = true Auto Hidden
+; -- Cosmetique
+; String[] WolfTextures
+; int Property WolfIndex = 0 Auto Hidden
+String[] BearTextures
+int Property BearIndex = 1 Auto Hidden
+; -- Debug
+String[] Werebeasts
+int iSetRace
 ; -- Lunar Transformation
+bool Property bLunarEnable = true Auto Hidden
 String[] LunarPresets
 int lunarIndex = 1
 float[] Property LunarChances Auto Hidden
@@ -14,14 +40,31 @@ float[] Property Skinwalker Auto Hidden
 ; =============================================================
 Event OnConfigInit()
   RegisterForSingleUpdateGameTime(1)
+  Actor Player = Game.GetPlayer()
 
+  ; Set Wolves & Werewolves friendly to our own Faction for Kinship..
+  WerewolfFaction.SetAlly(NightmareNightFaction, true, true)
+  WolfFaction.SetAlly(NightmareNightFaction, true, true)
+  If(Player.HasSpell(WerewolfTransform))
+    Debug.Notification("Wolves and Werewolves are now friendly towards you.")
+  EndIf
+
+  ; Reset Vanilla Perks..
+  int incPerks = 0
+  int i = 0
+  While(i < VanillaPerks.Length)
+    If(Player.HasPerk(VanillaPerks[i]))
+      Player.RemovePerk(VanillaPerks[i])
+      WerewolfPerks.Value += 1
+      incPerks -= 1
+    EndIf
+    i += 1
+  EndWhile
+  Game.IncrementStat("NumWerewolfPerks", incPerks)
+
+  ; Setup Menu
   Pages = new String[1]
   Pages[0] = "$NN_pConfig"
-
-  WolfkinList = new String[3]
-  WolfkinList[0] = "$NN_WolfkinList_0" ; No Alliance
-  WolfkinList[1] = "$NN_WolfkinList_1" ; Werebeast only
-  WolfkinList[2] = "$NN_WolfkinList_2" ; Always
 
   LunarPresets = new String[4]
   LunarPresets[0] = "$NN_LunarPreset_0" ; Warg
@@ -29,7 +72,16 @@ Event OnConfigInit()
   LunarPresets[2] = "$NN_LunarPreset_2" ; Cursed Blood
   LunarPresets[3] = "$NN_LunarPreset_3" ; Custom
 
+  Werebeasts = new String[2]
+  Werebeasts[0] = "$NN_Wererace_0" ; Werewolf
+  Werebeasts[1] = "$NN_Wererace_1" ; Werebear
 
+  BearTextures = new String[15]
+  int s = 0
+  While(s < BearTextures.Length)
+    BearTextures[s] = "$NN_WerebearTex_" + s
+    s += 1
+  EndWhile
 
   LunarChances = new float[9]
   SetLunarChances()
@@ -50,22 +102,31 @@ EndEvent
 ; =============================== MENU
 ; =============================================================
 Event OnPageReset(string a_page)
-  AddHeaderOption("$NN_LunarTransformation")
-  AddMenuOptionST("LunarPreset", "$NN_LunarPreset", LunarPresets[lunarIndex])
+  SetCursorFillMode(TOP_TO_BOTTOM)
+  AddHeaderOption("$NN_General")
+  AddToggleOptionST("WolfkinAlliance", "$NN_WolfkinAlliance", bWolfkinAlliance)
+  AddToggleOptionST("TurnBackAnimation", "$NN_TurnBackAnimation", bTurnBackAnimation)
+  AddToggleOptionST("TurnBackStagger", "$NN_TurnBackStagger", bTurnBackStagger)
+  AddToggleOptionST("TurnBackNude", "$NN_TurnBackNude", bTurnBackNude)
   AddEmptyOption()
+  AddHeaderOption("$NN_Cosmetique")
+  ; AddMenuOptionST("WerewolfTex", "$NN_WerewolfTex", WolfTextures[WolfIndex]) ; Waiting for Perms on this one
+  AddMenuOptionST("WerebearTex", "$NN_WerebearTex", BearTextures[BearIndex])
+  AddEmptyOption()
+  AddHeaderOption("$NN_Debug")
+  iSetRace = Math.abs(IsWerewolf.GetValueInt() - 1) as int
+  AddMenuOptionST("SetRace", "$NN_SetRace", Werebeasts[iSetRace])
+  AddTextOptionST("TurnWerebeast", "$NN_TurnWerebeast", "")
+  AddTextOptionST("CureWerebeast", "$NN_CureWerebeast", "")
+  SetCursorPosition(1)
+  AddHeaderOption("$NN_LunarTransformation")
+  AddToggleOptionST("LunarEnable", "$NN_LunarEnable", bLunarEnable)
+  AddMenuOptionST("LunarPreset", "$NN_LunarPreset", LunarPresets[lunarIndex])
   int flag = getFlag(lunarIndex == 3)
-  AddSliderOptionST("LunarChance_4", "$NN_LunarChance_4", LunarChances[4], "{1}%", flag)
-  AddSliderOptionST("LunarChance_5", "$NN_LunarChance_5", LunarChances[5], "{1}%", flag)
-  AddSliderOptionST("LunarChance_6", "$NN_LunarChance_6", LunarChances[6], "{1}%", flag)
-  AddSliderOptionST("LunarChance_7", "$NN_LunarChance_7", LunarChances[7], "{1}%", flag)
-  AddSliderOptionST("LunarChance_0", "$NN_LunarChance_0", LunarChances[0], "{1}%", flag)
-  AddSliderOptionST("LunarChance_1", "$NN_LunarChance_1", LunarChances[1], "{1}%", flag)
-  AddSliderOptionST("LunarChance_2", "$NN_LunarChance_2", LunarChances[2], "{1}%", flag)
-  AddSliderOptionST("LunarChance_3", "$NN_LunarChance_3", LunarChances[3], "{1}%", flag)
-  AddSliderOptionST("LunarChance_8", "$NN_LunarChance_8", LunarChances[8], "{1}%", flag)
   int i = 0
   While(i < LunarChances.Length)
-    
+    int n = (4 + i) % 9
+    AddSliderOptionST("LunarChance_" + n, "$NN_LunarChance_" + n, LunarChances[n], "{1}%", flag)
     i += 1
   EndWhile
 EndEvent
@@ -89,7 +150,7 @@ Event OnSliderAcceptST(Float afValue)
   If(option[0] == "LunarChance")
     int i = option[1] as int
     LunarChances[i] = afValue
-    SetSliderOptionValueST(LunarChances[i])
+    SetSliderOptionValueST(LunarChances[i], "{1}%")
   EndIf
 EndEvent
 
@@ -98,7 +159,7 @@ Event OnDefaultST()
   If(option[0] == "LunarChance")
     int i = option[1] as int
     LunarChances[i] = Skinwalker[i]
-    SetSliderOptionValueST(LunarChances[i])
+    SetSliderOptionValueST(LunarChances[i], "{1}%")
   EndIf
 EndEvent
 
@@ -113,6 +174,104 @@ EndEvent
 ; =============================================================
 ; =============================== STATES
 ; =============================================================
+State WolfkinAlliance
+  Event OnSelectST()
+    bWolfkinAlliance = !bWolfkinAlliance
+    SetToggleOptionValueST(bWolfkinAlliance)
+    Actor pl = Game.GetPlayer()
+    If(bWolfkinAlliance && pl.HasSpell(WerewolfImmunity))
+      pl.AddToFaction(NightmareNightFaction)
+    Else
+      pl.RemoveFromFaction(NightmareNightFaction)
+    EndIf
+  EndEvent
+  Event OnDefaultST()
+    bWolfkinAlliance = false
+    SetToggleOptionValueST(bWolfkinAlliance)
+    Game.GetPlayer().RemoveFromFaction(NightmareNightFaction)
+  EndEvent
+  Event OnHighlightST()
+    SetInfoText("$NN_WolfkinAllianceHighlight")
+  EndEvent
+EndState
+
+State TurnBackAnimation
+  Event OnSelectST()
+    bTurnBackAnimation = !bTurnBackAnimation
+    SetToggleOptionValueST(bTurnBackAnimation)
+  EndEvent
+  Event OnDefaultST()
+    bTurnBackAnimation = true
+    SetToggleOptionValueST(bTurnBackAnimation)
+  EndEvent
+  Event OnHighlightST()
+    SetInfoText("$NN_TurnBackAnimationHighlight")
+  EndEvent
+EndState
+
+State TurnBackStagger
+  Event OnSelectST()
+    bTurnBackStagger = !bTurnBackStagger
+    SetToggleOptionValueST(bTurnBackStagger)
+  EndEvent
+  Event OnDefaultST()
+    bTurnBackStagger = false
+    SetToggleOptionValueST(bTurnBackStagger)
+  EndEvent
+  Event OnHighlightST()
+    SetInfoText("$NN_TurnBackStaggerHighlight")
+  EndEvent
+EndState
+
+State TurnBackNude
+  Event OnSelectST()
+    bTurnBackNude = !bTurnBackNude
+    SetToggleOptionValueST(bTurnBackNude)
+  EndEvent
+  Event OnDefaultST()
+    bTurnBackNude = true
+    SetToggleOptionValueST(bTurnBackNude)
+  EndEvent
+  Event OnHighlightST()
+    SetInfoText("$NN_TurnBackNudeHighlight")
+  EndEvent
+EndState
+
+; ================= Cosmetique
+State WerebearTex
+  Event OnMenuOpenST()
+    SetMenuDialogStartIndex(BearIndex)
+    SetMenuDialogDefaultIndex(1)
+    SetMenuDialogOptions(BearTextures)
+  EndEvent
+  Event OnMenuAcceptST(Int aiIndex)
+    BearIndex = aiIndex
+    SetMenuOptionValueST(BearTextures[BearIndex])
+  EndEvent
+  Event OnDefaultST()
+    BearIndex = 1
+    SetMenuOptionValueST(BearTextures[BearIndex])
+  EndEvent
+  Event OnHighlightST()
+    SetInfoText("$NN_WerebearTexHighlight")
+  EndEvent
+EndState
+
+; ================= Lunar Transformation
+State LunarEnable
+  Event OnSelectST()
+    bLunarEnable = !bLunarEnable
+    SetToggleOptionValueST(bLunarEnable)
+  EndEvent
+  Event OnDefaultST()
+    bLunarEnable = false
+    SetToggleOptionValueST(bLunarEnable)
+  EndEvent
+  Event OnHighlightST()
+    SetInfoText("$NN_LunarEnableHighlight")
+  EndEvent
+EndState
+
 State LunarPreset
   Event OnMenuOpenST()
     SetMenuDialogStartIndex(lunarIndex)
@@ -134,9 +293,75 @@ State LunarPreset
   EndEvent
 EndState
 
+; ================= Debug
+State SetRace
+  Event OnMenuOpenST()
+    SetMenuDialogStartIndex(iSetRace)
+    SetMenuDialogDefaultIndex(0)
+    SetMenuDialogOptions(Werebeasts)
+  EndEvent
+  Event OnMenuAcceptST(Int aiIndex)
+    SetMenuOptionValueST(Werebeasts[aiIndex])
+    IsWerewolf.Value = Math.abs(aiIndex - 1)
+  EndEvent
+  Event OnHighlightST()
+    SetInfoText("$NN_SetRaceHighlight")
+  EndEvent
+EndState
+
+State TurnWerebeast
+  Event OnSelectST()
+    If(ShowMessage("$NN_TurnWerebeastMsg"))
+      TurnWerebeast()
+    EndIf
+  EndEvent
+  Event OnHighlightST()
+    SetInfoText("$NN_TurnWerebeastHighlight")
+  EndEvent
+EndState
+
+State CureWerebeast
+  Event OnSelectST()
+    If(ShowMessage("$NN_CureWerebeastMsg"))
+      TurnWerebeast()
+    EndIf
+  EndEvent
+  Event OnHighlightST()
+    SetInfoText("$NN_CureWerebeastHighlight")
+  EndEvent
+EndState
+
 ; =============================================================
 ; =============================== UTILITY & MISC
 ; =============================================================
+Function TurnWerebeast()
+  Actor pl = Game.GetPlayer()
+
+  If(pl.HasKeyword(Vampire))
+    VampireQ.VampireCure(pl)
+  EndIf
+  CureDiseases.Cast(pl)
+  pl.AddSpell(WerewolfTransform, false)
+  pl.AddSpell(WerewolfImmunity, false)
+
+  If(bWolfkinAlliance)
+    pl.AddToFaction(NightmareNightFaction)
+  EndIf
+
+  PlayerIsWerewolf.Value = 1
+EndFunction
+
+Function CureWerebeast()
+  Actor pl = Game.GetPlayer()
+
+  pl.RemoveSpell(WerewolfTransform)
+  pl.RemoveSpell(WerewolfImmunity)
+
+  pl.RemoveFromFaction(NightmareNightFaction)
+
+  PlayerIsWerewolf.Value = 0
+EndFunction
+
 Function SetLunarChances()
   If(lunarIndex == 0) ; Warg
     LunarChances[0] = 100
@@ -172,7 +397,9 @@ Function SetLunarChances()
   int flag = getFlag(lunarIndex == 3)
   int i = 0
   While(i < LunarChances.Length)
-    SetOptionFlagsST(flag, i != 8, "LunarChance_" + i)
+    String l = "LunarChance_" + i
+    SetOptionFlagsST(flag, i != 7, l)
+    SetSliderOptionValueST(LunarChances[i], "{1}%", i != 7, l)
     i += 1
   EndWhile
 EndFunction

@@ -6,7 +6,7 @@ GlobalVariable Property LunarPhase Auto
 Event OnEffectStart(Actor akTarget, Actor akCaster)
   ; The Effect is applied when you got Nightmare of the Silent Night or Nightmare Night. Nightmare Night only shreds half Stamina & Magicka though
   If(akTarget.IsDead())
-    Debug.MessageBox("It ded, m8")
+    ; Debug.MessageBox("It ded, m8")
     return
   EndIf
   If(akCaster.IsDetectedBy(akTarget))

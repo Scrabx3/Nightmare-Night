@@ -1,6 +1,19 @@
 Scriptname NNLunarTransform extends Quest
 {Main Cycle Script for Hunger & Lunar Transformation}
 
+;/
+TODO:
+- Test Spirit Prey Draugr
+- Implement Spirit Prey Sabrecat, Dragon and Deer
+- UI Stuff (FLASH YAY FINALLY)
+
+- Leveled Actor Lists for Haul or the Pack
+- MCM Options
+-- (Check on Moonlight Tales MCM Options bttttw)
+
+- Wait for Feedback(?)
+/;
+
 NNMCM Property MCM Auto
 PlayerWerewolfChangeScript Property WWQ Auto
 
@@ -23,7 +36,7 @@ bool Property LunarTransform Auto Hidden
 
 
 Event OnUpdateGameTime()
-  Debug.MessageBox("NIGHTMARE NIGHT - Update Game Time")
+  ; Debug.MessageBox("NIGHTMARE NIGHT - Update Game Time")
   float g = GameHour.Value
 
   ; float daysPassed = GameDaysPassed.Value
@@ -39,7 +52,7 @@ Event OnUpdateGameTime()
   ;   hoursTillHunger = 24
   ; EndIf
 
-  If(g >= 19.00 || g < 1.00)
+  If(MCM.bLunarEnable && g >= 19.00 || g < 1.00)
     float moonphase = GetMoonphase()
     int moonphaseINT = moonphase as int
     If(moonphase < 1 && !(moonphase > 0 && moonphase < 0.5))
@@ -62,8 +75,8 @@ Event OnUpdateGameTime()
   float hoursTillNight = 19.0 - g
   If(hoursTillNight <= 0)
     hoursTillNight = 24.0 + hoursTillNight
-    RegisterForSingleUpdateGameTime(hoursTillNight)
   EndIf
+  RegisterForSingleUpdateGameTime(hoursTillNight)
   ; If(hoursTillHunger < hoursTillNight)
   ;   RegisterForSingleUpdateGameTime(hoursTillHunger)
   ; Else
@@ -136,7 +149,7 @@ EndFunction
 ;/ =======================================
   The Lunar Cycle
   - A Lunar Cycle is divided in 8 Phases, all lasting 3 Days each (-> 24 Days for one entire Phase)
-  - The first day in a new Game is the 3rd day of Waxing Gibbous (the next night will be a Full Moon)
+  - The first day in a new Game is the 3rd day of Waxing Gibbous (the next night will be a Fragmented Full Moon)
   - Masser isnt tied to Gamedays, manipulating the Time (Date) is not affecting its phases
   - In Skyrim, Secunda is mimicing Masser and can be ignored for any Interaction
 
@@ -152,8 +165,9 @@ EndFunction
 ======================================= /;
 float Function GetMoonPhase()
   int daysPassed = GameDaysPassed.GetValueInt()
-  If (GameHour.Value >= 12) ; Past this days night, get Phase of the following one
-    daysPassed += 1
+  ; If we are before 12.00, calcuate Moonphase based on the previous Night
+  If(GameHour.Value < 12)
+    daysPassed -= 1
   EndIf
   return ((daysPassed % 24) as float) / 3.0
 EndFunction

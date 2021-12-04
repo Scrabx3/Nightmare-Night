@@ -10,8 +10,6 @@ Scriptname PlayerWerewolfChangeScript extends Quest
 4) Setting Stage100 will end the Transformation
 /;
 
-; TODO: 3/6 Spirit Prey
-
 ; =============================== VANILLA PROPERTIES
 float Property StandardDurationSeconds auto
 {How long (in real seconds) the transformation lasts}
@@ -99,6 +97,8 @@ Message Property LunarExtendTime Auto
 GlobalVariable Property IsWerewolf Auto
 Race Property DLC2WerebearRace Auto
 Armor Property BearSkinFXArmor Auto
+Formlist Property BearFXArmorList Auto
+Formlist Property WolfFXArmorList Auto
 
 Keyword Property NightmareRequiem Auto
 Spell Property NightmaresRequiemDispel Auto
@@ -138,9 +138,13 @@ Spell Property FrenzyLv0 Auto
 
 Spell Property DestroyObjSpell Auto
 
+EffectShader Property TransformFX02 Auto
+
 Shout LastEquippedShout
 Spell LastEquippedPower
 
+Form WerebeastFXArmor
+Form Property TransitionArmor Auto Hidden
 Race PlayerRace
 
 ; =============================================================
@@ -154,6 +158,16 @@ EndFunction
 float Function GameTimeDaysToRealTimeSeconds(float gametime)
   float gameSeconds = gametime * (60 * 60 * 24)
   return (gameSeconds / TimeScale.Value)
+EndFunction
+
+Function SetObjectManagerObjects()
+  If(IsWerewolf.Value == 1)
+    DefObjMananager.SetForm("RIVR", WerewolfBeastRace)
+  Else
+    DefObjMananager.SetForm("RIWR", DLC2WerebearRace)
+    DefObjMananager.SetForm("RIVR", DLC2WerebearRace)
+  EndIf
+  DefObjMananager.SetForm("RIVS", WerewolfAbilities)
 EndFunction
 
 ; =============================================================
@@ -171,13 +185,7 @@ Function PrepShift()
   RIWR = DefObjMananager.GetForm("RIWR") ; Werewolf Race
   RIVR = DefObjMananager.GetForm("RIVR") ; Vampire Race
   RIVS = DefObjMananager.GetForm("RIVS") ; Vampire Spells
-  If(IsWerewolf.Value == 1)
-    DefObjMananager.SetForm("RIVR", WerewolfBeastRace)
-  Else
-    DefObjMananager.SetForm("RIWR", DLC2WerebearRace)
-    DefObjMananager.SetForm("RIVR", DLC2WerebearRace)
-  EndIf
-  DefObjMananager.SetForm("RIVS", WerewolfAbilities)
+  SetObjectManagerObjects()
 
   ; sets up the UI restrictions
   Game.SetBeastForm(True)
@@ -240,10 +248,19 @@ Function StartTracking()
   ; Game.GetPlayer().RemoveAllItems(LycanStash)
   Player.UnequipAll()
   If(IsWerewolf.Value == 1)
-    Player.EquipItem(WolfSkinFXArmor, False, True)
+    ; If(Lunar.MCM.WolfIndex)
+    ;   WerebeastFXArmor = BearFXArmorList.GetAt(Lunar.MCM.WolfIndex - 1)
+    ; Else
+      WerebeastFXArmor = WolfSkinFXArmor
+    ; EndIf
   Else
-    Player.EquipItem(BearSkinFXArmor, False, True)
+    If(Lunar.MCM.BearIndex)
+      WerebeastFXArmor = BearFXArmorList.GetAt(Lunar.MCM.BearIndex - 1)
+    Else
+      WerebeastFXArmor = BearSkinFXArmor
+    EndIf
   EndIf
+  Player.EquipItem(WerebeastFXArmor, true, true)
 
   ; Add Blood Effects
   ; FeedBloodVFX.Play(Game.GetPlayer())
@@ -353,7 +370,6 @@ Function StartTracking()
     LunarPhase.Value = Lunar.GetMoonPhase() as int
   EndIf
 
-  ; COMEBACK: Perks that influence this timer should be noted here
   ; calculate when the player turns back into a pumpkin
   float currentTime = GameDaysPassed.GetValue()
   float regressTime
@@ -434,8 +450,7 @@ EndFunction
 ; The Default Object Manager Objects are apparently resettet after a Gameload
 ; I guess thats a good thing but we dont want that to happen while still transformed
 Function PlayerReloadGame()
-  DefObjMananager.SetForm("RIVR", WerewolfBeastRace)
-  DefObjMananager.SetForm("RIVS", WerewolfAbilities)
+  SetObjectManagerObjects()
 EndFunction
 
 ; Called by Lunar Transform if were shifted while a Lunar Shift triggers. Extending duration of the Shift till dawn
@@ -557,29 +572,48 @@ Function ActuallyShiftBackIfNecessary()
     count += 1
   endwhile
 
+  ; Dont have the player die now..
+  Player.SetGhost()
+
+  ; Bleedout Anim if enabled...
+  If(Lunar.MCM.bTurnBackAnimation)
+    Debug.SendAnimationEvent(Player, "bleedoutStart")
+    Utility.Wait(2)
+    TransformFX02.Play(Player)
+    Utility.Wait(1)
+  EndIf
+
   ; make sure the transition armor is gone. We RemoveItem here, because the SetRace stored all equipped items
   ; at that time, and we equip this armor prior to setting the player to a beast race. When we switch back,
   ; if this were still in the player's inventory it would be re-equipped.
-  Player.RemoveItem(WolfSkinFXArmor, 1, True)
+  ; Player.RemoveItem(WolfSkinFXArmor, 1, True)
+  Player.RemoveItem(TransitionArmor, abSilent = true)
 
   ; clear out perks/abilities
   ; (don't need to do this anymore since it's on from gamestart)
   ; Game.GetPlayer().RemovePerk(PlayerWerewolfFeed)
 
   ; make sure your health is reasonable before turning you back
-  ; Game.GetPlayer().GetActorBase().SetInvulnerable(true)
-  Player.SetGhost()
+  ; Heal the Player to have at least 1Hp left before transforming back..
   float currHealth = Player.GetActorValue("health")
   float minHealth = 150.0 + (150 * Player.HasPerk(NightmareNight) as int)
   if (currHealth <= minHealth)
     ; Debug.Trace("WEREWOLF: Player's health is only " + currHealth + "; restoring.")
     Player.RestoreAV("health", minHealth - currHealth)
   endif
-
   ; change you back
   ; Debug.Trace("WEREWOLF: Setting race " + (CompanionsTrackingQuest as CompanionsHousekeepingScript).PlayerOriginalRace + " on " + Game.GetPlayer())
   ; Player.SetRace((CompanionsTrackingQuest as CompanionsHousekeepingScript).PlayerOriginalRace)
+  Player.RemoveItem(WerebeastFXArmor, abSilent = true)
   Player.SetRace(PlayerRace)
+  If(Lunar.MCM.bTurnBackNude)
+    Player.UnequipAll()
+  EndIf
+  If(Lunar.MCM.bTurnBackStagger)
+    Utility.Wait(0.7)
+    Debug.SendAnimationEvent(Player, "staggerStart")
+  EndIf
+
   ; release the player controls
   ; Debug.Trace("WEREWOLF: Restoring camera controls")
   Game.EnablePlayerControls(abMovement = false, abFighting = false, abCamSwitch = true, abLooking = false, abSneaking = false, abMenu = false, abActivate = false, abJournalTabs = false, aiDisablePOVType = 1)
@@ -628,10 +662,13 @@ Function ActuallyShiftBackIfNecessary()
     (CrimeFactions.GetAt(cfIndex) as Faction).SetPlayerEnemy(false)
     cfIndex += 1
   endwhile
+
   ; and you're now recognized
   Game.SetPlayerReportCrime(true)
   ; alert anyone nearby that they should now know the player is a werewolf
   Game.SendWereWolfTransformation()
+  ; Disable the FX stuff from the Animation here
+  TransformFX02.Stop(Player)
   ; give the set race event a chance to come back, otherwise shut us down
   Utility.Wait(5)
   Shutdown()
