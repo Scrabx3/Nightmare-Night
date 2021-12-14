@@ -18,8 +18,11 @@ float property fDelayEnd = 1.65 auto
 bool bFlash = false
 
 VisualEffect Property SpiritPreyAbsorbEffect Auto ; Wind stuff
-EffectShader Property SpiritPreyAbsorbSFX Auto ; Orange Glow - Recolored to be Blue White
+EffectShader Property SpiritPreyAbsorbSFX Auto ; Orange Glow
 Sound Property NPCDragonDeathSequenceWind Auto
+Sound Property NPCDragonDeathSequenceWindMiraak Auto ; This is much shorter than the default one nya
+Message Property PerkDescriptor Auto
+
 GlobalVariable Property DeathCount Auto
 Perk Property SpiritPreyWolfPerk Auto
 int Property Level Auto Hidden
@@ -53,14 +56,15 @@ EVENT onDYING(ACTOR killer)
 			Utility.Wait(3)
 			Actor player = Game.GetPlayer()
 			; SpiritPreyAbsorbEffect.Play(self, 6.0, player)
-			NPCDragonDeathSequenceWind.Play(player)
+			NPCDragonDeathSequenceWindMiraak.Play(player)
 			SpiritPreyAbsorbSFX.Play(player, 4.3)
 			; Utility.Wait(4)
 			; SpiritPreyAbsorbSFX.Stop(player)
 			; Utility.Wait(3)
 			; SpiritPreyAbsorbEffect.Stop(player)
-
+			Utility.Wait(5)
 			player.AddPerk(SpiritPreyWolfPerk)
+			PerkDescriptor.Show()
 		EndIf
 	Else ; Spawn in next Wolves
 		NNSpiritPreyWolf wolf1 = PlaceAtMe(Self.GetActorBase(), 1) as NNSpiritPreyWolf

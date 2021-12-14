@@ -13,6 +13,7 @@ Spell Property WerewolfImmunity Auto
 Spell Property CureDiseases Auto
 
 GlobalVariable Property WerewolfPerks Auto
+GlobalVariable Property WerewolfNextPerk Auto
 Perk[] Property VanillaPerks Auto
 
 ; -- General
@@ -21,6 +22,8 @@ bool Property bTurnBackAnimation = true Auto Hidden
 bool Property bTurnBackStagger = false Auto Hidden
 bool Property bTurnBackNude = true Auto Hidden
 ; -- Cosmetique
+String[] NPCTextures
+int Property iNPCTex Auto Hidden
 ; String[] WolfTextures
 ; int Property WolfIndex = 0 Auto Hidden
 String[] BearTextures
@@ -61,6 +64,7 @@ Event OnConfigInit()
     i += 1
   EndWhile
   Game.IncrementStat("NumWerewolfPerks", incPerks)
+  WerewolfNextPerk.Value = WerewolfPerks.Value + 5
 
   ; Setup Menu
   Pages = new String[1]
@@ -119,6 +123,8 @@ Event OnPageReset(string a_page)
   AddTextOptionST("TurnWerebeast", "$NN_TurnWerebeast", "")
   AddTextOptionST("CureWerebeast", "$NN_CureWerebeast", "")
   SetCursorPosition(1)
+  AddHeaderOption("$NN_NPC")
+  AddMenuOptionST("NPCTex", "$NN_NPCTexture", NPCTextures[iNPCTex])
   AddHeaderOption("$NN_LunarTransformation")
   AddToggleOptionST("LunarEnable", "$NN_LunarEnable", bLunarEnable)
   AddMenuOptionST("LunarPreset", "$NN_LunarPreset", LunarPresets[lunarIndex])
@@ -238,6 +244,25 @@ State TurnBackNude
 EndState
 
 ; ================= Cosmetique
+State NPCTex
+  Event OnMenuOpenST()
+    SetMenuDialogStartIndex(iNPCTex)
+    SetMenuDialogDefaultIndex(1)
+    SetMenuDialogOptions(NPCTextures)
+  EndEvent
+  Event OnMenuAcceptST(Int aiIndex)
+    iNPCTex = aiIndex
+    SetMenuOptionValueST(NPCTextures[iNPCTex])
+  EndEvent
+  Event OnDefaultST()
+    iNPCTex = 1
+    SetMenuOptionValueST(NPCTextures[iNPCTex])
+  EndEvent
+  Event OnHighlightST()
+    SetInfoText("$NN_NPCTextureHighlight")
+  EndEvent
+EndState
+
 State WerebearTex
   Event OnMenuOpenST()
     SetMenuDialogStartIndex(BearIndex)

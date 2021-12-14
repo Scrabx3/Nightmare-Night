@@ -2,6 +2,7 @@ Scriptname NNSpiritPreySkeever extends Actor
 
 ObjectReference[] Property SpawnLocation Auto
 EffectShader Property Invisibility Auto
+Spell Property ScentOfBlood Auto
 
 EffectShader Property pGhostDeathFXShader Auto
 Activator Property pDefaultAshPileGhost Auto
@@ -9,7 +10,9 @@ LeveledItem Property pdefaultGhostLeveledList Auto
 
 Perk Property SpiritPreySkeever Auto
 EffectShader Property SpiritPreyAbsorb Auto
-Sound Property NPCDragonDeathSequenceWind Auto
+Sound Property NPCDragonDeathSequenceWind Auto ; unused
+Sound Property NPCDragonDeathSequenceWindMiraak Auto
+Message Property PerkDescriptor Auto
 int hits
 
 Event OnLoad()
@@ -24,6 +27,7 @@ Event OnHit(ObjectReference akAggressor, Form akSource, Projectile akProjectile,
       Kill()
       return
     EndIf
+    DispelSpell(ScentOfBlood)
     MoveTo(SpawnLocation[hits])
     StopCombat()
     StopCombatAlarm()
@@ -43,9 +47,11 @@ Event OnDying(Actor akKiller)
   
   Utility.Wait(3)
   Actor player = Game.GetPlayer()
-  NPCDragonDeathSequenceWind.Play(player)
-  Utility.Wait(0.5)
+  NPCDragonDeathSequenceWindMiraak.Play(player)
   SpiritPreyAbsorb.Play(player, 4.3)
+  Utility.Wait(5)
   player.AddPerk(SpiritPreySkeever)
+  PerkDescriptor.Show()
+
   SetCriticalStage(Self.CritStage_DisintegrateEnd)
 EndEvent

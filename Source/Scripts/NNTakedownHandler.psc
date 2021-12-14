@@ -2,6 +2,7 @@ Scriptname NNTakedownHandler extends ActiveMagicEffect
 
 GlobalVariable Property FrenzyStacks Auto
 Spell[] Property BloodFrenzy Auto
+Spell Property BloodFrenzySpell Auto
 Perk Property NightmareNight Auto
 
 GlobalVariable Property DLC1WerewolfFeedPoints Auto
@@ -54,20 +55,28 @@ Event OnDying(Actor akKiller)
     The purpose of this Block here is only the count up & maintain the Buff
     whenver something dies
   ======================================= /;
-  int frenzy = FrenzyStacks.Value as int
-  Debug.Trace("NIGHTMARE NIGHT: Stacking Bloodrush -- Current Level = " + frenzy)
-  ; Nightmare Night Perk doubles Frenzy gain and grants 10% Hp per Kill. Doing both here to not twice
+  Debug.Trace("NIGHTMARE NIGHT: Stacking Bloodrush -- Current Level = " + FrenzyStacks.GetValueInt())
+  FrenzyStacks.Value += 1
   If(Player.HasPerk(NightmareNight))
-    Player.RestoreActorValue("Health", Player.GetActorValueMax("Health") * 0.1)
-    frenzy += 1
+    FrenzyStacks.Value += 1
   EndIf
-  If(frenzy < 10)
-    BloodFrenzy[frenzy].Cast(Player)
-    frenzy += 1
-  Else ; Theres no Frenzy Lv11+, just refresh Lv10
-    BloodFrenzy[9].Cast(Player)
-  EndIf
-  FrenzyStacks.Value = frenzy
+  BloodFrenzySpell.Cast(Player)
+  Debug.Trace("NIGHTMARE NIGHT: Stacking Bloodrush -- New Level = " + FrenzyStacks.GetValueInt())
+
+  ; int frenzy = FrenzyStacks.Value as int
+  ; Debug.Trace("NIGHTMARE NIGHT: Stacking Bloodrush -- Current Level = " + frenzy)
+  ; ; Nightmare Night Perk doubles Frenzy gain and grants 10% Hp per Kill. Doing both here to not twice
+  ; If(Player.HasPerk(NightmareNight))
+  ;   Player.RestoreActorValue("Health", Player.GetActorValueMax("Health") * 0.05)
+  ;   frenzy += 1
+  ; EndIf
+  ; If(frenzy < 10)
+  ;   BloodFrenzy[frenzy].Cast(Player)
+  ;   frenzy += 1
+  ; Else ; Theres no Frenzy Lv11+, just refresh Lv10
+  ;   BloodFrenzy[9].Cast(Player)
+  ; EndIf
+  ; FrenzyStacks.Value = frenzy
 EndEvent
 
 

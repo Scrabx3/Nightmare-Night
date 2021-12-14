@@ -3,19 +3,15 @@ Scriptname NNLunarTransform extends Quest
 
 ;/
 TODO:
-- Test Spirit Prey Draugr
-- Implement Spirit Prey Sabrecat, Dragon and Deer
+- WW Hunters
 - UI Stuff (FLASH YAY FINALLY)
-
-- Leveled Actor Lists for Haul or the Pack
-- MCM Options
--- (Check on Moonlight Tales MCM Options bttttw)
 
 - Wait for Feedback(?)
 /;
 
 NNMCM Property MCM Auto
 PlayerWerewolfChangeScript Property WWQ Auto
+Keyword Property WerebeastKeyword Auto
 
 GlobalVariable Property GameHour Auto
 GlobalVariable Property GameDaysPassed Auto
@@ -30,12 +26,21 @@ ImageSpaceModifier Property LunarTransformFlashImod Auto
 ImageSpaceModifier[] Property LunarTransformWarnImod Auto
 Spell Property LunarTransformSpell Auto
 
-Keyword Property WerebeastKeyword Auto
+Actor[] Property SpiritPrey Auto
+GlobalVariable Property WolfKillCount Auto
 
 bool Property LunarTransform Auto Hidden
-
+bool IsPreySpawned = false
 
 Event OnUpdateGameTime()
+  If(Game.GetPlayer().HasSpell(MCM.WerewolfImmunity) == false)
+    ; Nothing to do if the Player isnt a Werebeast
+    ; The cd will be enabled after changing once, so if the player turns through AP or the Companion Questline
+    ; Their forced Transformation will do the starting here
+    ; If he turns through NN, the Cd is started through there. Otherwise idk. Just transform I guess :<
+    return
+  EndIf
+
   ; Debug.MessageBox("NIGHTMARE NIGHT - Update Game Time")
   float g = GameHour.Value
 
@@ -61,40 +66,101 @@ Event OnUpdateGameTime()
     EndIf
     MoonPhaseNotifies[moonphaseINT].Show()
     If(Utility.RandomFloat(0, 99.9) < MCM.LunarChances[moonphaseINT])
-      UnregisterForUpdateGameTime()
       ; Dont transform if were already shifted..
       If(Game.GetPlayer().HasKeyword(WerebeastKeyword))
-
+        WWQ.ExtendToDawn()
+        GoToState("SpawnSpirits")
       Else
         GoToState("Transform")
       EndIf
       return ; next Update is handled by Werewolf Quest
+    ElseIf(!IsPreySpawned)
+      GoToState("SpawnSpirits")
+      return
     EndIf
+  ElseIf(IsPreySpawned)
+    DespawnSpiritPrey()
   EndIf
 
-  float hoursTillNight = 19.0 - g
-  If(hoursTillNight <= 0)
-    hoursTillNight = 24.0 + hoursTillNight
-  EndIf
-  RegisterForSingleUpdateGameTime(hoursTillNight)
-  ; If(hoursTillHunger < hoursTillNight)
-  ;   RegisterForSingleUpdateGameTime(hoursTillHunger)
-  ; Else
-  ;   RegisterForSingleUpdateGameTime(hoursTillNight)
-  ; EndIf
+  CreateNextUpdate()
 EndEvent
+
+Function CreateNextUpdate()
+  float g = GameHour.Value
+  float update
+  If(g < 5.0)
+    update = 5.0 - g
+  ElseIf(g > 19)
+    update = 29.0 - g
+  Else
+    update = 19.0 - g
+  EndIf
+  If(update < 0.025)
+    update = 0.025
+  EndIf
+  RegisterForSingleUpdateGameTime(update)
+EndFunction
+
+float Function TimeTill21()
+  float gh = GameHour.Value
+  If(gh < 21.00)
+    ; If were below 21.00, figure out when 21.00 is
+    float fg =  1 - gh + (gh as int)
+    If(gh < 20)
+      ; If below 20.00, (its til full hour + 1) until 21.00
+      fg += 1
+    ElseIf(fg < 0.03)
+      fg = 0.03
+    EndIf
+    Debug.Trace("NIGHTMARE NIGHT - GameHour = " + gh + "TimeTill21 = " + fg)
+    return fg
+  Else
+    ; 21.00 and 1.00
+    Debug.Trace("NIGHTMARE NIGHT - GameHour = " + gh + "TimeTill21 = 0.025")
+    return 0.025
+  EndIf
+EndFunction
+
+State SpawnSpirits
+  Event OnBeginState()
+    ; Spirits spawn at 21.00
+    RegisterForSingleUpdateGameTime(TimeTill21())
+  EndEvent
+
+  Event OnUpdateGameTime()
+    SpawnSpiritPrey()
+    GoToState("")
+    CreateNextUpdate()
+  EndEvent
+EndState
 
 State Transform
   Event OnBeginState()
-    float gh = GameHour.Value
-    float fg = 1 - gh + (gh as int)
-    fg = Utility.RandomFloat(fg, fg + 1.0)
-    ; Update will be somewhere within the next full hour (e.g. if cur time 19.xx transform is between 20.00 and 21.00)
-    RegisterForSingleUpdateGameTime(fg)
+    ; Earliest Time to transform is between 20 and 21
+    float t = TimeTill21()
+    If(t == 0.025)
+      ; if past 21, spawn Spirit Prey & transform in the next hour
+      SpawnSpiritPrey()
+      t = Utility.RandomFloat(0.5, 1.0)
+    ElseIf(t > 1)
+      ; if still 19.xx, transform the player between 20.00 and 21.00
+      t = Utility.RandomFloat(t - 1, t)
+    Else
+      ; if at 20.xx, transform the player between now and 21.00
+      t = Utility.RandomFloat(0.025, t)
+    EndIf
+    Debug.Trace("NIGHTMARE NIGHT - Transformation in = " + t)
+    RegisterForSingleUpdateGameTime(t)
+    ; float gh = GameHour.Value
+    ; float fg = 1 - gh + (gh as int)
+    ; fg = Utility.RandomFloat(fg, fg + 1.0)
+    ; ; Update will be somewhere within the next full hour (e.g. if cur time 19.xx transform is between 20.00 and 21.00)
+    ; RegisterForSingleUpdateGameTime(fg)
     ; Debug.MessageBox("NIGHTMARE NIGHT - Update in " + fg)
   EndEvent
 
   Event OnUpdateGameTime()
+    SpawnSpiritPrey()
     LunarTransform = true
     int imod = 2 ; HungerLevel.GetValueInt()
     ;/ All Imods have a Rampup time which is dependend on the Hunger Stage which colors the Screen dark red over time
@@ -122,20 +188,53 @@ State Transform
 EndState
 
 ;/ =======================================
+  Spirit Prey
+  Those are Bosses that spawn during the Night and vanish again at Dawn. Each of them grants
+  the Player a special Perk. They can be hunted in either Beast or Human Form (though they are have
+  fairly high stats which might make them feel unfair outside of beast form \o/)
+  • Skeever: Scent of Blood differs between Friendly & Hostile
+  • Deer: +10 Movement Speed out of Beast Form
+  • Wolf: Howl of Pack inherits Stats from Player
+  • Sabrecat: +15 Claw Damage, heal for 15 Hp with each Hit
+  • Draugr: Howl of Terror +20 Magnitude & stops affected Enemies from moving until hit once
+  • Dragon: Reduce Howl Cooldowns by 20%
+======================================= /;
+Function SpawnSpiritPrey()
+  If(IsPreySpawned)
+    return
+  EndIf
+  IsPreySpawned = true
+  int n = 0
+  While(n < SpiritPrey.Length)
+    If(!SpiritPrey[n].IsDead())
+      SpiritPrey[n].Enable()
+    ElseIf(n == 2 && WolfKillCount.Value < 32)
+      SpiritPrey[n].Reset()
+      WolfKillCount.Value = 0
+    EndIf
+    n += 1
+  EndWhile
+EndFunction
+
+Function DespawnSpiritPrey()
+  int i = 0
+  While(i < SpiritPrey.Length)
+    SpiritPrey[i].Disable(true)
+    i += 1
+  EndWhile
+  IsPreySpawned = false
+EndFunction
+;/ =======================================
   Hunger System; For every so and so many Feedings gain a few buffs or debuffs. This essentially mimics the Vampire Thirst System.. just different
   Hunger defines the warn time before a Lunar Transformation happens and includes the following Buffs & Debuffs:
   === Stage 0
   Disease Resistance -100% (negated)
   -50 Max Stamina
-
   === Stage 1
   Disease Resistance -50%
-
   === Stage 2
-
   === Stage 3
   +10% Movement Speed in and out of beastform
-
 ======================================= /;
 Function ManageHunger()
   ; int stage = HungerLevel.GetValueInt()

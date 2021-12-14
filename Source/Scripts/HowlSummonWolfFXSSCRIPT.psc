@@ -2,17 +2,14 @@ Scriptname HowlSummonWolfFXSSCRIPT extends Actor
 
 Perk Property SpiritWolfPerk Auto
 
-Event OnEffectStart(Actor akTarget, Actor akCaster)
-	If(akCaster.HasPerk(SpiritWolfPerk)) ; Make them inherit Stats
-		akTarget.ModActorValue("UnarmedDamage", akCaster.GetActorValue("UnarmedDamage") * 0.5)
-		; akTarget.ModActorValue("Health", akCaster.GetActorValue("Health") * 0.2)
-		akTarget.ModActorValue("DamageResist", akCaster.GetActorValue("DamageResist") * 0.5)
-		akTarget.ModActorValue("MagicResist", akCaster.GetActorValue("MagicResist") * 0.5)
-	EndIf
-EndEvent
-
 Event OnLoad()
-	RegisterForSingleUpdate(60)
+	Actor Player = Game.GetPlayer()
+	If(Player.HasPerk(SpiritWolfPerk)) ; Make them inherit Stats if Player killed the Everdoubting
+		ModActorValue("UnarmedDamage", Player.GetActorValue("UnarmedDamage") * 0.75)
+		ModActorValue("Health", Player.GetActorValue("Health") * 0.2)
+		ModActorValue("DamageResist", Player.GetActorValue("DamageResist") * 0.75)
+		ModActorValue("MagicResist", Player.GetActorValue("MagicResist") * 0.75)
+	EndIf
 EndEvent
 
 Event OnDying(Actor akKiller)
@@ -24,11 +21,12 @@ Function TurnOff()
 	Disable(true)
 EndFunction
 
+
+
 EFFECTSHADER PROPERTY ghostEffect AUTO
 FLOAT PROPERTY ghostAlpha=0.1 AUTO
-;/ Since we no longer spawn them on top of the player itll feel more realistic to not
-have them be Ghosts. That way it looks more like they are just running to the Player
-from somewhere nearby(?)
+
+;/ Wolfies no longer ghosties
 
 BOOL bFlash=FALSE
 

@@ -2,18 +2,19 @@ Scriptname NNNightmaresRequiem extends ActiveMagicEffect
 
 PlayerWerewolfChangeScript Property WWQuest Auto
 
+Spell Property BloodFrenzy Auto
 Spell Property RequiemDispel Auto
-Spell Property BloodFrenzyLv5 Auto
 Spell[] Property WWAbilities Auto
 Formlist Property CrimeFactions Auto
 GlobalVariable Property FrenzyStacks Auto
-Keyword Property BloodFrenzyKW Auto
 Perk Property Wrath Auto
 
 ImageSpaceModifier Property NightmareRequiemIntroImod Auto
 ImageSpaceModifier Property NightmareRequiemImod Auto
 ImageSpaceModifier Property NightmareRequiemOutroImot Auto
 
+Keyword Property BloodFrenzyKW Auto
+Spell Property BloodFrenzyLv5 Auto
 ;/ =======================================
   Nightmares Requiem
   This is supposed to be some kind of "inbetween" Lycan Transformation. This Script acts as the
@@ -57,19 +58,11 @@ Event OnEffectStart(Actor akTarget, Actor akCaster)
     akTarget.UnequipSpell(right, 1)
   EndIf
 
-  ; Set up the polling. This is primarily to handle Blood Frenzy
-  ; COMEBACK: Convert into Register for Event if I move this into AS2..
-  RegisterForUpdate(5)
-
   ; Set up Frenzy if you got Wrath
   If(akTarget.HasPerk(Wrath))
     FrenzyStacks.Value = 5
-    BloodFrenzyLv5.Cast(akTarget)
-  EndIf
-EndEvent
-
-Event OnUpdate()
-  If(Game.GetPlayer().HasMagicEffectWithKeyword(BloodFrenzyKW) == false)
+    BloodFrenzy.Cast(akTarget)
+  Else
     FrenzyStacks.Value = 0
   EndIf
 EndEvent

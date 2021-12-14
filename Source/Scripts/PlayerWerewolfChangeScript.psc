@@ -128,13 +128,11 @@ GlobalVariable Property LastFeeding Auto
 GlobalVariable Property Feedings Auto
 
 Perk Property Wrath Auto
-Perk Property RadiantNight Auto
 Perk Property NightmareNight Auto
 
 GlobalVariable Property FrenzyStacks Auto
-Keyword Property FrenzyKeyword Auto
-Spell[] Property BloodFrenzy Auto
-Spell Property FrenzyLv0 Auto
+Keyword Property BloodFrenzyKeyword Auto
+Spell Property BloodFrenzySpell Auto
 
 Spell Property DestroyObjSpell Auto
 
@@ -146,6 +144,12 @@ Spell LastEquippedPower
 Form WerebeastFXArmor
 Form Property TransitionArmor Auto Hidden
 Race PlayerRace
+
+; Unused
+Perk Property RadiantNight Auto
+Keyword Property FrenzyKeyword Auto
+Spell[] Property BloodFrenzy Auto
+Spell Property FrenzyLv0 Auto
 
 ; =============================================================
 ; =============================== UTILITY
@@ -397,7 +401,9 @@ Function StartTracking()
   ; add Frenzy Lv5 if player has Wrath
   If(Player.HasPerk(Wrath))
     FrenzyStacks.Value = 5
-    BloodFrenzy[4].Cast(Player)
+    BloodFrenzySpell.Cast(Player)
+  Else
+    FrenzyStacks.Value = 0
   EndIf
   ; and quick spell for destroying webs..
   RegisterForAnimationEvent(Player, "WeaponSwing")
@@ -410,10 +416,10 @@ EndFunction
 
 Event OnUpdate()
   Actor Player = Game.GetPlayer()
-  If(!Player.HasMagicEffectWithKeyword(FrenzyKeyword))
-    ; Debug.Trace("NIGHTMARE NIGHT: Resetting Frenzy Tick -- Level = " + FrenzyStacks.Value)
-    FrenzyStacks.Value = 0
-  ElseIf(Player.HasPerk(Wrath))
+  ; If(!Player.HasMagicEffectWithKeyword(FrenzyKeyword))
+  ;   ; Debug.Trace("NIGHTMARE NIGHT: Resetting Frenzy Tick -- Level = " + FrenzyStacks.Value)
+  ;   FrenzyStacks.Value = 0
+  If(Player.HasPerk(Wrath) && Player.HasMagicEffectWithKeyword(BloodFrenzyKeyword))
     return
   EndIf
 
@@ -422,7 +428,7 @@ Event OnUpdate()
   EndIf
   ; Debug.Trace("WEREWOLF: NumWerewolfPerks = " + Game.QueryStat("NumWerewolfPerks"))
   If(Game.QueryStat("NumWerewolfPerks") >= DLC1WerewolfMaxPerks.Value) ; !IMPORTANT keep this Stat updated
-    ; debug.trace("WEREWOLF: achievement granted")
+    debug.trace("WEREWOLF: achievement granted")
     ; Game.AddAchievement(57)
   EndIf
 
@@ -464,8 +470,8 @@ Function ExtendToDawn()
   EndIf
   PlayerWerewolfShiftBackTime.SetValue(regressTime)
   LunarExtendTime.Show()
-  Debug.Trace("NIGHTMARE NIGHT - WEREWOLF: Current day -- " + currentTime)
-  Debug.Trace("NIGHTMARE NIGHT - WEREWOLF: Player will turn back at day " + regressTime)
+  ; Debug.Trace("NIGHTMARE NIGHT - WEREWOLF: Current day -- " + currentTime)
+  ; Debug.Trace("NIGHTMARE NIGHT - WEREWOLF: Player will turn back at day " + regressTime)
 EndFunction
 
 ;/ =======================================
@@ -474,7 +480,7 @@ EndFunction
   Healing is handled in its own Spell, see NNWerewolfFeed.psc
 ======================================= /;
 Function Feed(Actor victim)
-  Debug.Trace("NIGHTMARE NIGHT: Feeding Start -- Current Shift Time = " + PlayerWerewolfShiftBackTime.Value + ", __feedExtensionTime = " + GameTimeDaysToRealTimeSeconds(__feedExtensionTime))
+  ; Debug.Trace("NIGHTMARE NIGHT: Feeding Start -- Current Shift Time = " + PlayerWerewolfShiftBackTime.Value + ", __feedExtensionTime = " + GameTimeDaysToRealTimeSeconds(__feedExtensionTime))
   Actor player = Game.GetPlayer()
   player.PlayIdle(SpecialFeeding)
   ; This is for adding a spell that simulates bleeding
@@ -486,19 +492,19 @@ Function Feed(Actor victim)
       addShiftTime += __GorgeExtensionTime
     EndIf
     If(!victim.HasKeyword(ActorTypeNPC))
-      Debug.Trace("NIGHTMARE NIGHT - Feeding on Creature, cutting Transformation Time Gain in Half")
+      ; Debug.Trace("NIGHTMARE NIGHT - Feeding on Creature, cutting Transformation Time Gain in Half")
       addShiftTime /= 2
     EndIf
     PlayerWerewolfShiftBackTime.Value += addShiftTime
     PlayerWerewolfFeedMessage.Show()
     FeedBoost.Cast(player) ; All the Healing & Feeding Buffs are handled in this Script. This also resets Blood Frenzy
-    Debug.Trace("NIGHTMARE NIGHT: Player feeding -- new regress day is " + PlayerWerewolfShiftBackTime.Value)
+    ; Debug.Trace("NIGHTMARE NIGHT: Player feeding -- new regress day is " + PlayerWerewolfShiftBackTime.Value)
   EndIf
   ; Progress Hunger
   Feedings.Value += 1
   LastFeeding.Value = GameDaysPassed.Value
   If(Feedings.Value > Math.pow(2, HungerLevel.Value + 1))
-    Debug.Trace("NIGHTMARE NIGHT: Progressing Player Hunger -- Level = " + HungerLevel.Value + ", Feedings = " + Feedings.Value)
+    ; Debug.Trace("NIGHTMARE NIGHT: Progressing Player Hunger -- Level = " + HungerLevel.Value + ", Feedings = " + Feedings.Value)
     HungerLevel.Value += 1
     Feedings.Value = 0
     Lunar.ManageHunger()
