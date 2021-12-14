@@ -21,9 +21,12 @@ bool bWolfkinAlliance = false
 bool Property bTurnBackAnimation = true Auto Hidden
 bool Property bTurnBackStagger = false Auto Hidden
 bool Property bTurnBackNude = true Auto Hidden
-; -- Cosmetique
+; -- Spirit Prey
+bool Property bDisableSpirit = false Auto Hidden
+; -- NPC
 String[] NPCTextures
 int Property iNPCTex Auto Hidden
+; -- Cosmetique
 ; String[] WolfTextures
 ; int Property WolfIndex = 0 Auto Hidden
 String[] BearTextures
@@ -87,6 +90,11 @@ Event OnConfigInit()
     s += 1
   EndWhile
 
+  NPCTextures = new String[3]
+  NPCTextures[0] = "$NN_NPCText_0"
+  NPCTextures[1] = "$NN_NPCText_1"
+  NPCTextures[2] = "$NN_NPCText_2"
+
   LunarChances = new float[9]
   SetLunarChances()
 
@@ -113,6 +121,8 @@ Event OnPageReset(string a_page)
   AddToggleOptionST("TurnBackStagger", "$NN_TurnBackStagger", bTurnBackStagger)
   AddToggleOptionST("TurnBackNude", "$NN_TurnBackNude", bTurnBackNude)
   AddEmptyOption()
+  AddHeaderOption("$NN_SpiritPrey")
+  AddToggleOptionST("DisableSpiritPrey", "$NN_SpiritDisable", bDisableSpirit)
   AddHeaderOption("$NN_Cosmetique")
   ; AddMenuOptionST("WerewolfTex", "$NN_WerewolfTex", WolfTextures[WolfIndex]) ; Waiting for Perms on this one
   AddMenuOptionST("WerebearTex", "$NN_WerebearTex", BearTextures[BearIndex])
@@ -125,6 +135,7 @@ Event OnPageReset(string a_page)
   SetCursorPosition(1)
   AddHeaderOption("$NN_NPC")
   AddMenuOptionST("NPCTex", "$NN_NPCTexture", NPCTextures[iNPCTex])
+  AddEmptyOption()
   AddHeaderOption("$NN_LunarTransformation")
   AddToggleOptionST("LunarEnable", "$NN_LunarEnable", bLunarEnable)
   AddMenuOptionST("LunarPreset", "$NN_LunarPreset", LunarPresets[lunarIndex])
@@ -243,7 +254,22 @@ State TurnBackNude
   EndEvent
 EndState
 
-; ================= Cosmetique
+; ================= Spirit Prey
+State DisableSpiritPrey
+  Event OnSelectST()
+    bDisableSpirit = !bDisableSpirit
+    SetToggleOptionValueST(bDisableSpirit)
+  EndEvent
+  Event OnDefaultST()
+    bDisableSpirit = false
+    SetToggleOptionValueST(bDisableSpirit)
+  EndEvent
+  Event OnHighlightST()
+    SetInfoText("$NN_SpiritDisableHighlight")
+  EndEvent
+EndState
+
+; ================= NPC
 State NPCTex
   Event OnMenuOpenST()
     SetMenuDialogStartIndex(iNPCTex)
@@ -263,6 +289,7 @@ State NPCTex
   EndEvent
 EndState
 
+; ================= Cosmetique
 State WerebearTex
   Event OnMenuOpenST()
     SetMenuDialogStartIndex(BearIndex)

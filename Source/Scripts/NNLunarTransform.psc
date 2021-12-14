@@ -200,7 +200,7 @@ EndState
   • Dragon: Reduce Howl Cooldowns by 20%
 ======================================= /;
 Function SpawnSpiritPrey()
-  If(IsPreySpawned)
+  If(IsPreySpawned || MCM.bDisableSpirit)
     return
   EndIf
   IsPreySpawned = true

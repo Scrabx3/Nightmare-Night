@@ -1,111 +1,61 @@
 ;BEGIN FRAGMENT CODE - Do not edit anything between this and the end comment
-;NEXT FRAGMENT INDEX 45
+;NEXT FRAGMENT INDEX 71
 Scriptname DLC1_QF_CreatureDialogueWerew_00000E46 Extends Quest Hidden
 
-;BEGIN FRAGMENT Fragment_8
-Function Fragment_8()
+;BEGIN FRAGMENT Fragment_61
+Function Fragment_61()
 ;BEGIN CODE
-; Player picks savage feeding perk
+; Player picks metabolism 3
 
 Game.IncrementStat("NumWerewolfPerks")
 ;END CODE
 EndFunction
 ;END FRAGMENT
 
-;BEGIN FRAGMENT Fragment_43
-Function Fragment_43()
+;BEGIN FRAGMENT Fragment_48
+Function Fragment_48()
 ;BEGIN CODE
-; Inhuman Strength
+; Player picks adapt
 
 Game.IncrementStat("NumWerewolfPerks")
 ;END CODE
 EndFunction
 ;END FRAGMENT
 
-;BEGIN FRAGMENT Fragment_26
-Function Fragment_26()
+;BEGIN FRAGMENT Fragment_47
+Function Fragment_47()
 ;BEGIN CODE
-; Shark Claws 1
+; Player picks break entry
 
 Game.IncrementStat("NumWerewolfPerks")
 ;END CODE
 EndFunction
 ;END FRAGMENT
 
-;BEGIN FRAGMENT Fragment_14
-Function Fragment_14()
+;BEGIN FRAGMENT Fragment_70
+Function Fragment_70()
 ;BEGIN CODE
-; Player picks Totem of Terror perk
+; Player picks nightmare night
 
 Game.IncrementStat("NumWerewolfPerks")
 ;END CODE
 EndFunction
 ;END FRAGMENT
 
-;BEGIN FRAGMENT Fragment_40
-Function Fragment_40()
+;BEGIN FRAGMENT Fragment_68
+Function Fragment_68()
 ;BEGIN CODE
-; Nightmare of the Radiant Night
+; Player picks nightmare of the lucent night
 
 Game.IncrementStat("NumWerewolfPerks")
 ;END CODE
 EndFunction
 ;END FRAGMENT
 
-;BEGIN FRAGMENT Fragment_21
-Function Fragment_21()
+;BEGIN FRAGMENT Fragment_17
+Function Fragment_17()
 ;BEGIN CODE
-; Player picks Aspect of Terror perk
-
-Game.IncrementStat("NumWerewolfPerks")
-;END CODE
-EndFunction
-;END FRAGMENT
-
-;BEGIN FRAGMENT Fragment_30
-Function Fragment_30()
-;BEGIN CODE
-; Bestial Hide 3
-
-Game.IncrementStat("NumWerewolfPerks")
-;END CODE
-EndFunction
-;END FRAGMENT
-
-;BEGIN FRAGMENT Fragment_0
-Function Fragment_0()
-;BEGIN CODE
-; Player picks beastial strength 25 perk
-
-Game.IncrementStat("NumWerewolfPerks")
-;END CODE
-EndFunction
-;END FRAGMENT
-
-;BEGIN FRAGMENT Fragment_24
-Function Fragment_24()
-;BEGIN CODE
-; Break Entry
-
-Game.IncrementStat("NumWerewolfPerks")
-;END CODE
-EndFunction
-;END FRAGMENT
-
-;BEGIN FRAGMENT Fragment_34
-Function Fragment_34()
-;BEGIN CODE
-; Breakthrough
-
-Game.IncrementStat("NumWerewolfPerks")
-;END CODE
-EndFunction
-;END FRAGMENT
-
-;BEGIN FRAGMENT Fragment_33
-Function Fragment_33()
-;BEGIN CODE
-; Violent Strike
+; Player picks Totem of Ice Brothers perk (Totem of the Moon)
 
 Game.IncrementStat("NumWerewolfPerks")
 ;END CODE
@@ -122,76 +72,6 @@ Game.IncrementStat("NumWerewolfPerks")
 EndFunction
 ;END FRAGMENT
 
-;BEGIN FRAGMENT Fragment_36
-Function Fragment_36()
-;BEGIN CODE
-; Bloodlust
-
-Game.IncrementStat("NumWerewolfPerks")
-;END CODE
-EndFunction
-;END FRAGMENT
-
-;BEGIN FRAGMENT Fragment_23
-Function Fragment_23()
-;BEGIN CODE
-; Revert Form
-
-Game.IncrementStat("NumWerewolfPerks")
-;END CODE
-EndFunction
-;END FRAGMENT
-
-;BEGIN FRAGMENT Fragment_31
-Function Fragment_31()
-;BEGIN CODE
-; Precision 1
-
-Game.IncrementStat("NumWerewolfPerks")
-;END CODE
-EndFunction
-;END FRAGMENT
-
-;BEGIN FRAGMENT Fragment_35
-Function Fragment_35()
-;BEGIN CODE
-; Adapt
-
-Game.IncrementStat("NumWerewolfPerks")
-;END CODE
-EndFunction
-;END FRAGMENT
-
-;BEGIN FRAGMENT Fragment_37
-Function Fragment_37()
-;BEGIN CODE
-; No Escape
-
-Game.IncrementStat("NumWerewolfPerks")
-;END CODE
-EndFunction
-;END FRAGMENT
-
-;BEGIN FRAGMENT Fragment_19
-Function Fragment_19()
-;BEGIN CODE
-; Player picks Totem of the Moon perk
-
-Game.IncrementStat("NumWerewolfPerks")
-;END CODE
-EndFunction
-;END FRAGMENT
-
-;BEGIN FRAGMENT Fragment_4
-Function Fragment_4()
-;BEGIN CODE
-; Player picks animal vigor perk
-
-Game.IncrementStat("NumWerewolfPerks")
-;END CODE
-EndFunction
-;END FRAGMENT
-
 ;BEGIN FRAGMENT Fragment_2
 Function Fragment_2()
 ;BEGIN CODE
@@ -202,60 +82,10 @@ Game.IncrementStat("NumWerewolfPerks")
 EndFunction
 ;END FRAGMENT
 
-;BEGIN FRAGMENT Fragment_22
-Function Fragment_22()
+;BEGIN FRAGMENT Fragment_57
+Function Fragment_57()
 ;BEGIN CODE
-; Hunters Vision Perk
-
-Game.IncrementStat("NumWerewolfPerks")
-;END CODE
-EndFunction
-;END FRAGMENT
-
-;BEGIN FRAGMENT Fragment_12
-Function Fragment_12()
-;BEGIN CODE
-; Player picks beastial strength 100 perk
-
-Game.IncrementStat("NumWerewolfPerks")
-;END CODE
-EndFunction
-;END FRAGMENT
-
-;BEGIN FRAGMENT Fragment_25
-Function Fragment_25()
-;BEGIN CODE
-; Player picks gorging perk Lv2
-
-Game.IncrementStat("NumWerewolfPerks")
-;END CODE
-EndFunction
-;END FRAGMENT
-
-;BEGIN FRAGMENT Fragment_44
-Function Fragment_44()
-;BEGIN CODE
-; Metabolism
-
-Game.IncrementStat("NumWerewolfPerks")
-;END CODE
-EndFunction
-;END FRAGMENT
-
-;BEGIN FRAGMENT Fragment_38
-Function Fragment_38()
-;BEGIN CODE
-; Wrath
-
-Game.IncrementStat("NumWerewolfPerks")
-;END CODE
-EndFunction
-;END FRAGMENT
-
-;BEGIN FRAGMENT Fragment_42
-Function Fragment_42()
-;BEGIN CODE
-; Nightmares Requiem
+; Player picks bestial hide 3
 
 Game.IncrementStat("NumWerewolfPerks")
 ;END CODE
@@ -272,70 +102,110 @@ Game.IncrementStat("NumWerewolfPerks")
 EndFunction
 ;END FRAGMENT
 
-;BEGIN FRAGMENT Fragment_17
-Function Fragment_17()
+;BEGIN FRAGMENT Fragment_66
+Function Fragment_66()
 ;BEGIN CODE
-; Player picks Totem of Ice Brothers perk
+; Player picks breakthrough
 
 Game.IncrementStat("NumWerewolfPerks")
 ;END CODE
 EndFunction
 ;END FRAGMENT
 
-;BEGIN FRAGMENT Fragment_28
-Function Fragment_28()
+;BEGIN FRAGMENT Fragment_69
+Function Fragment_69()
 ;BEGIN CODE
-; Bestial Hide 1
+; Player picks nightmare of the silent night
 
 Game.IncrementStat("NumWerewolfPerks")
 ;END CODE
 EndFunction
 ;END FRAGMENT
 
-;BEGIN FRAGMENT Fragment_32
-Function Fragment_32()
+;BEGIN FRAGMENT Fragment_49
+Function Fragment_49()
 ;BEGIN CODE
-; Precision 2
+; Player picks hunters vision
 
 Game.IncrementStat("NumWerewolfPerks")
 ;END CODE
 EndFunction
 ;END FRAGMENT
 
-;BEGIN FRAGMENT Fragment_39
-Function Fragment_39()
+;BEGIN FRAGMENT Fragment_58
+Function Fragment_58()
 ;BEGIN CODE
-; Nightmare of the Silent Night
+; Player picks inhuman strength
 
 Game.IncrementStat("NumWerewolfPerks")
 ;END CODE
 EndFunction
 ;END FRAGMENT
 
-;BEGIN FRAGMENT Fragment_27
-Function Fragment_27()
+;BEGIN FRAGMENT Fragment_12
+Function Fragment_12()
 ;BEGIN CODE
-; Shark Claws 2
+; Player picks beastial strength 100 perk
 
 Game.IncrementStat("NumWerewolfPerks")
 ;END CODE
 EndFunction
 ;END FRAGMENT
 
-;BEGIN FRAGMENT Fragment_41
-Function Fragment_41()
+;BEGIN FRAGMENT Fragment_45
+Function Fragment_45()
 ;BEGIN CODE
-; Nightmare Night
+; Player picks animal vigor perk 2
 
 Game.IncrementStat("NumWerewolfPerks")
 ;END CODE
 EndFunction
 ;END FRAGMENT
 
-;BEGIN FRAGMENT Fragment_29
-Function Fragment_29()
+;BEGIN FRAGMENT Fragment_14
+Function Fragment_14()
 ;BEGIN CODE
-; Bestial Hide 2
+; Player picks Totem of Terror perk
+
+Game.IncrementStat("NumWerewolfPerks")
+;END CODE
+EndFunction
+;END FRAGMENT
+
+;BEGIN FRAGMENT Fragment_8
+Function Fragment_8()
+;BEGIN CODE
+; Player picks savage feeding perk
+
+Game.IncrementStat("NumWerewolfPerks")
+;END CODE
+EndFunction
+;END FRAGMENT
+
+;BEGIN FRAGMENT Fragment_50
+Function Fragment_50()
+;BEGIN CODE
+; Player picks gluttony
+
+Game.IncrementStat("NumWerewolfPerks")
+;END CODE
+EndFunction
+;END FRAGMENT
+
+;BEGIN FRAGMENT Fragment_19
+Function Fragment_19()
+;BEGIN CODE
+; Player picks Totem of the Moon perk (Aspect of the Moon)
+
+Game.IncrementStat("NumWerewolfPerks")
+;END CODE
+EndFunction
+;END FRAGMENT
+
+;BEGIN FRAGMENT Fragment_67
+Function Fragment_67()
+;BEGIN CODE
+; Player picks aspect of terror
 
 Game.IncrementStat("NumWerewolfPerks")
 ;END CODE
@@ -345,7 +215,157 @@ EndFunction
 ;BEGIN FRAGMENT Fragment_16
 Function Fragment_16()
 ;BEGIN CODE
-; Player picks Totem Predator perk
+; Player picks Totem Predator perk (Aspect of the Hunt)
+
+Game.IncrementStat("NumWerewolfPerks")
+;END CODE
+EndFunction
+;END FRAGMENT
+
+;BEGIN FRAGMENT Fragment_46
+Function Fragment_46()
+;BEGIN CODE
+; Player picks gorging 2
+
+Game.IncrementStat("NumWerewolfPerks")
+;END CODE
+EndFunction
+;END FRAGMENT
+
+;BEGIN FRAGMENT Fragment_54
+Function Fragment_54()
+;BEGIN CODE
+; Player picks nightmare requiem
+
+Game.IncrementStat("NumWerewolfPerks")
+;END CODE
+EndFunction
+;END FRAGMENT
+
+;BEGIN FRAGMENT Fragment_51
+Function Fragment_51()
+;BEGIN CODE
+; Player picks bloodlust
+
+Game.IncrementStat("NumWerewolfPerks")
+;END CODE
+EndFunction
+;END FRAGMENT
+
+;BEGIN FRAGMENT Fragment_59
+Function Fragment_59()
+;BEGIN CODE
+; Player picks metabolism 1
+
+Game.IncrementStat("NumWerewolfPerks")
+;END CODE
+EndFunction
+;END FRAGMENT
+
+;BEGIN FRAGMENT Fragment_55
+Function Fragment_55()
+;BEGIN CODE
+; Player picks bestial hide 1
+
+Game.IncrementStat("NumWerewolfPerks")
+;END CODE
+EndFunction
+;END FRAGMENT
+
+;BEGIN FRAGMENT Fragment_53
+Function Fragment_53()
+;BEGIN CODE
+; Player picks wrath
+
+Game.IncrementStat("NumWerewolfPerks")
+;END CODE
+EndFunction
+;END FRAGMENT
+
+;BEGIN FRAGMENT Fragment_0
+Function Fragment_0()
+;BEGIN CODE
+; Player picks beastial strength 25 perk
+
+Game.IncrementStat("NumWerewolfPerks")
+;END CODE
+EndFunction
+;END FRAGMENT
+
+;BEGIN FRAGMENT Fragment_65
+Function Fragment_65()
+;BEGIN CODE
+; Player picks violent strike
+
+Game.IncrementStat("NumWerewolfPerks")
+;END CODE
+EndFunction
+;END FRAGMENT
+
+;BEGIN FRAGMENT Fragment_62
+Function Fragment_62()
+;BEGIN CODE
+; Player picks revert form
+
+Game.IncrementStat("NumWerewolfPerks")
+;END CODE
+EndFunction
+;END FRAGMENT
+
+;BEGIN FRAGMENT Fragment_4
+Function Fragment_4()
+;BEGIN CODE
+; Player picks animal vigor perk 1
+
+Game.IncrementStat("NumWerewolfPerks")
+;END CODE
+EndFunction
+;END FRAGMENT
+
+;BEGIN FRAGMENT Fragment_52
+Function Fragment_52()
+;BEGIN CODE
+; Player picks no escape
+
+Game.IncrementStat("NumWerewolfPerks")
+;END CODE
+EndFunction
+;END FRAGMENT
+
+;BEGIN FRAGMENT Fragment_63
+Function Fragment_63()
+;BEGIN CODE
+; Player picks precision 1
+
+Game.IncrementStat("NumWerewolfPerks")
+;END CODE
+EndFunction
+;END FRAGMENT
+
+;BEGIN FRAGMENT Fragment_60
+Function Fragment_60()
+;BEGIN CODE
+; Player picks metabolism 2
+
+Game.IncrementStat("NumWerewolfPerks")
+;END CODE
+EndFunction
+;END FRAGMENT
+
+;BEGIN FRAGMENT Fragment_64
+Function Fragment_64()
+;BEGIN CODE
+; Player picks precision 2
+
+Game.IncrementStat("NumWerewolfPerks")
+;END CODE
+EndFunction
+;END FRAGMENT
+
+;BEGIN FRAGMENT Fragment_56
+Function Fragment_56()
+;BEGIN CODE
+; Player picks bestial hide 2
 
 Game.IncrementStat("NumWerewolfPerks")
 ;END CODE
