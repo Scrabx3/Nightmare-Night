@@ -38,7 +38,7 @@ Event OnEffectStart(Actor akTarget, Actor akCaster)
   float speed = (0.025 + 0.035 * IsWerewolf.Value) * frenzy
   ; Both Werebears and Werewolves take an additional 5% Damage with each Frenzy Level
   float defense = 0.05 * frenzy
-  Debug.Trace("NIGHTMARE NIGHT - Blood Frenzy Effect Start - damage = " + damage + "; speed = " + speed + "; defense = " + defense)
+  ; Debug.Trace("NIGHTMARE NIGHT - Blood Frenzy Effect Start - damage = " + damage + "; speed = " + speed + "; defense = " + defense)
 
   BloodFrenzy.SetNthEntryValue(0, 1, damage) ; Damage
   BloodFrenzy.SetNthEntryValue(2, 1, speed) ; Speed
@@ -51,7 +51,6 @@ Event OnEffectFinish(Actor akTarget, Actor akCaster)
     ; If this effect ended because Blood Frenzy has been reapplied, dont reset Level
     return
   EndIf
-  Debug.Trace("NIGHTMARE NIGHT - Blood Frenzy Effect Stop - resetting damage = " + (0.15 - 0.05 * IsWerewolf.Value) + "; speed = " + (0.03 + 0.03 * IsWerewolf.Value) + "; defense = 0.05")
 
   BloodFrenzy.SetNthEntryValue(0, 1, 0.15 - 0.05 * IsWerewolf.Value) ; Damage
   BloodFrenzy.SetNthEntryValue(2, 1, 0.03 + 0.03 * IsWerewolf.Value) ; Speed

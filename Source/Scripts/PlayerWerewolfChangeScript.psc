@@ -427,7 +427,7 @@ Event OnUpdate()
     return
   EndIf
 
-  Debug.Trace("WEREWOLF: NumWerewolfPerks = " + Game.QueryStat("NumWerewolfPerks") + "/" + DLC1WerewolfMaxPerks.Value)
+  ; Debug.Trace("WEREWOLF: NumWerewolfPerks = " + Game.QueryStat("NumWerewolfPerks") + "/" + DLC1WerewolfMaxPerks.Value)
   If(Game.QueryStat("NumWerewolfPerks") >= DLC1WerewolfMaxPerks.Value) ; !IMPORTANT keep this Stat updated
     debug.trace("WEREWOLF: achievement granted")
     ; Game.AddAchievement(57)
