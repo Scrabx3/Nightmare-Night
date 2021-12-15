@@ -145,12 +145,6 @@ Form WerebeastFXArmor
 Form Property TransitionArmor Auto Hidden
 Race PlayerRace
 
-; Unused
-Perk Property RadiantNight Auto
-Keyword Property FrenzyKeyword Auto
-Spell[] Property BloodFrenzy Auto
-Spell Property FrenzyLv0 Auto
-
 ; =============================================================
 ; =============================== UTILITY
 ; =============================================================

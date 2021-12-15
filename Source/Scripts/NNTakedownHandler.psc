@@ -1,7 +1,6 @@
 Scriptname NNTakedownHandler extends ActiveMagicEffect  
 
 GlobalVariable Property FrenzyStacks Auto
-Spell[] Property BloodFrenzy Auto
 Spell Property BloodFrenzySpell Auto
 Perk Property NightmareNight Auto
 

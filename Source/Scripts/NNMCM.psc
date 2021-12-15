@@ -23,6 +23,7 @@ bool Property bTurnBackStagger = false Auto Hidden
 bool Property bTurnBackNude = true Auto Hidden
 ; -- Spirit Prey
 bool Property bDisableSpirit = false Auto Hidden
+GlobalVariable Property gDisableHunters Auto
 ; -- NPC
 String[] NPCTextures
 int Property iNPCTex Auto Hidden
@@ -120,8 +121,8 @@ Event OnPageReset(string a_page)
   AddToggleOptionST("TurnBackAnimation", "$NN_TurnBackAnimation", bTurnBackAnimation)
   AddToggleOptionST("TurnBackStagger", "$NN_TurnBackStagger", bTurnBackStagger)
   AddToggleOptionST("TurnBackNude", "$NN_TurnBackNude", bTurnBackNude)
-  AddEmptyOption()
-  AddHeaderOption("$NN_SpiritPrey")
+  AddHeaderOption("$NN_WorldEncounters")
+  AddToggleOptionST("EnableHunters", "$NN_Hunters", gDisableHunters.Value)
   AddToggleOptionST("DisableSpiritPrey", "$NN_SpiritDisable", bDisableSpirit)
   AddHeaderOption("$NN_Cosmetique")
   ; AddMenuOptionST("WerewolfTex", "$NN_WerewolfTex", WolfTextures[WolfIndex]) ; Waiting for Perms on this one
@@ -135,10 +136,10 @@ Event OnPageReset(string a_page)
   SetCursorPosition(1)
   AddHeaderOption("$NN_NPC")
   AddMenuOptionST("NPCTex", "$NN_NPCTexture", NPCTextures[iNPCTex])
-  AddEmptyOption()
   AddHeaderOption("$NN_LunarTransformation")
   AddToggleOptionST("LunarEnable", "$NN_LunarEnable", bLunarEnable)
   AddMenuOptionST("LunarPreset", "$NN_LunarPreset", LunarPresets[lunarIndex])
+  AddEmptyOption()
   int flag = getFlag(lunarIndex == 3)
   int i = 0
   While(i < LunarChances.Length)
@@ -254,7 +255,21 @@ State TurnBackNude
   EndEvent
 EndState
 
-; ================= Spirit Prey
+; ================= World Encounters
+State EnableHunters
+  Event OnSelectST()
+    gDisableHunters.Value = Math.abs(gDisableHunters.Value - 1)
+    SetToggleOptionValueST(gDisableHunters.Value)
+  EndEvent
+  Event OnDefaultST()
+    gDisableHunters.Value = 0
+    SetToggleOptionValueST(gDisableHunters.Value)
+  EndEvent
+  Event OnHighlightST()
+    SetInfoText("$NN_HuntersHighlight")
+  EndEvent
+EndState
+
 State DisableSpiritPrey
   Event OnSelectST()
     bDisableSpirit = !bDisableSpirit
@@ -401,6 +416,8 @@ Function TurnWerebeast()
   EndIf
 
   PlayerIsWerewolf.Value = 1
+
+  RegisterForSingleUpdateGameTime(1)
 EndFunction
 
 Function CureWerebeast()
@@ -412,6 +429,8 @@ Function CureWerebeast()
   pl.RemoveFromFaction(NightmareNightFaction)
 
   PlayerIsWerewolf.Value = 0
+
+  UnregisterForUpdateGameTime()
 EndFunction
 
 Function SetLunarChances()

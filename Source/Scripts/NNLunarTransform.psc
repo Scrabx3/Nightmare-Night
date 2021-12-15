@@ -270,3 +270,22 @@ float Function GetMoonPhase()
   EndIf
   return ((daysPassed % 24) as float) / 3.0
 EndFunction
+
+;/ =======================================
+  Radiant Encounter Attacks from the Silverhand (IDEA: Add Vigilant Hunters?)
+  Number of Silverhand Encounters will increase as the Player progresses through
+  the Companions Questline. Once Kodlak dies, Encounters will be slightly less
+======================================= /;
+GlobalVariable Property NNWENextAttack Auto
+Quest Property C04 Auto
+Quest Property C06 Auto
+Function SetNNWENextAttack()
+	int DaysUntilNextAttack = 5 ;default value
+  If(C06.IsCompleted())
+    DaysUntilNextAttack += 1
+  ElseIf(C04.IsCompleted())
+    DaysUntilNextAttack -= 2
+  EndIf
+	NNWENextAttack.SetValue(GameDaysPassed.GetValue() + DaysUntilNextAttack)
+	Debug.Trace(self + "SetNNWENextAttack() NNWENextAttack = " + NNWENextAttack.GetValue())
+EndFunction
