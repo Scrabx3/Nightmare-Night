@@ -61,7 +61,8 @@ Event OnEffectStart(Actor akTarget, Actor akCaster)
   ; Set up Frenzy if you got Wrath
   If(akTarget.HasPerk(Wrath))
     FrenzyStacks.Value = 5
-    BloodFrenzy.Cast(akTarget)
+    SendModEvent("NightmareNightFrenzyStart", "", 5.0)
+    ; BloodFrenzy.Cast(akTarget)
   Else
     FrenzyStacks.Value = 0
   EndIf

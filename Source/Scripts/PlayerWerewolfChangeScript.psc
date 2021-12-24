@@ -395,7 +395,8 @@ Function StartTracking()
   ; add Frenzy Lv5 if player has Wrath
   If(Player.HasPerk(Wrath))
     FrenzyStacks.Value = 5
-    BloodFrenzySpell.Cast(Player)
+    SendModEvent("NightmareNightFrenzyStart", "", 5.0)
+    ; BloodFrenzySpell.Cast(Player)
   Else
     FrenzyStacks.Value = 0
   EndIf

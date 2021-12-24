@@ -45,7 +45,7 @@ Event OnDying(Actor akKiller)
       DLC1WerewolfTotalPerksEarned.Value += 1
       DLC1WerewolfNextPerk.Value += 1 ; DLC1WerewolfNextPerk.Value + 2
       DLC1WerewolfPerkEarned.Show()
-      Debug.Trace("NIGHTMARE NIGHT: New perk (Feed points " + DLC1WerewolfFeedPoints.Value +", Next perk " + DLC1WerewolfNextPerk.Value + ", Perk pionts " + DLC1WerewolfPerkPoints.value + ")")
+      ; Debug.Trace("NIGHTMARE NIGHT: New perk (Feed points " + DLC1WerewolfFeedPoints.Value +", Next perk " + DLC1WerewolfNextPerk.Value + ", Perk pionts " + DLC1WerewolfPerkPoints.value + ")")
     EndIf
   EndIf
 
@@ -54,13 +54,14 @@ Event OnDying(Actor akKiller)
     The purpose of this Block here is only the count up & maintain the Buff
     whenver something dies
   ======================================= /;
-  Debug.Trace("NIGHTMARE NIGHT: Stacking Bloodrush -- Current Level = " + FrenzyStacks.GetValueInt())
-  FrenzyStacks.Value += 1
+  ; Debug.Trace("NIGHTMARE NIGHT: Stacking Bloodrush -- Current Level = " + FrenzyStacks.GetValueInt())
+  float frenzy = FrenzyStacks.Value + 1
   If(Player.HasPerk(NightmareNight))
-    FrenzyStacks.Value += 1
+    frenzy += 1
   EndIf
-  BloodFrenzySpell.Cast(Player)
-  Debug.Trace("NIGHTMARE NIGHT: Stacking Bloodrush -- New Level = " + FrenzyStacks.GetValueInt())
+  FrenzyStacks.Value = frenzy
+  me.SendModEvent("NightmareNightFrenzyStart", "", frenzy)
+  ; BloodFrenzySpell.Cast(Player)
 
   ; int frenzy = FrenzyStacks.Value as int
   ; Debug.Trace("NIGHTMARE NIGHT: Stacking Bloodrush -- Current Level = " + frenzy)
