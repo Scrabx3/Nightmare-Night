@@ -130,6 +130,11 @@ class skyui.widgets.NightmareNight.Frenzy extends WidgetBase {
 		_playfrenzy = !pause;
 	}
 
+	public function endfrenzy():Void {
+		meter.setPercent(0, true);
+		kill();
+	}
+
 	// private misc
 	// @Overrides WidgetBase
 	private function getWidth():Number {

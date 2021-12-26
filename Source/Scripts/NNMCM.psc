@@ -1,4 +1,4 @@
-Scriptname NNMCM extends SKI_ConfigBase  
+Scriptname NNMCM extends SKI_ConfigBase Conditional
 
 Faction Property NightmareNightFaction Auto
 Faction Property WerewolfFaction Auto
@@ -17,7 +17,7 @@ GlobalVariable Property WerewolfNextPerk Auto
 Perk[] Property VanillaPerks Auto
 
 ; -- General
-bool bWolfkinAlliance = false
+bool Property bWolfkinAlliance = false Auto Hidden Conditional
 bool Property bTurnBackAnimation = true Auto Hidden
 bool Property bTurnBackStagger = false Auto Hidden
 bool Property bTurnBackNude = true Auto Hidden
@@ -52,9 +52,9 @@ Event OnConfigInit()
   ; Set Wolves & Werewolves friendly to our own Faction for Kinship..
   WerewolfFaction.SetAlly(NightmareNightFaction, true, true)
   WolfFaction.SetAlly(NightmareNightFaction, true, true)
-  If(Player.HasSpell(WerewolfTransform))
-    Debug.Notification("Wolves and Werewolves are now friendly towards you.")
-  EndIf
+  ; If(Player.HasSpell(WerewolfTransform))
+  ;   Debug.Notification("Wolves and Werewolves are now friendly towards you.")
+  ; EndIf
 
   ; Reset Vanilla Perks..
   int incPerks = 0
@@ -196,17 +196,10 @@ State WolfkinAlliance
   Event OnSelectST()
     bWolfkinAlliance = !bWolfkinAlliance
     SetToggleOptionValueST(bWolfkinAlliance)
-    Actor pl = Game.GetPlayer()
-    If(bWolfkinAlliance && pl.HasSpell(WerewolfImmunity))
-      pl.AddToFaction(NightmareNightFaction)
-    Else
-      pl.RemoveFromFaction(NightmareNightFaction)
-    EndIf
   EndEvent
   Event OnDefaultST()
     bWolfkinAlliance = false
     SetToggleOptionValueST(bWolfkinAlliance)
-    Game.GetPlayer().RemoveFromFaction(NightmareNightFaction)
   EndEvent
   Event OnHighlightST()
     SetInfoText("$NN_WolfkinAllianceHighlight")
@@ -390,7 +383,7 @@ EndState
 State CureWerebeast
   Event OnSelectST()
     If(ShowMessage("$NN_CureWerebeastMsg"))
-      TurnWerebeast()
+      CureWerebeast()
     EndIf
   EndEvent
   Event OnHighlightST()
@@ -411,10 +404,6 @@ Function TurnWerebeast()
   pl.AddSpell(WerewolfTransform, false)
   pl.AddSpell(WerewolfImmunity, false)
 
-  If(bWolfkinAlliance)
-    pl.AddToFaction(NightmareNightFaction)
-  EndIf
-
   PlayerIsWerewolf.Value = 1
 
   RegisterForSingleUpdateGameTime(1)
@@ -425,8 +414,6 @@ Function CureWerebeast()
 
   pl.RemoveSpell(WerewolfTransform)
   pl.RemoveSpell(WerewolfImmunity)
-
-  pl.RemoveFromFaction(NightmareNightFaction)
 
   PlayerIsWerewolf.Value = 0
 

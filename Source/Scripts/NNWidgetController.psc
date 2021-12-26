@@ -14,9 +14,11 @@ EndProperty
 
 ; Default Positions for the Base Widget
 float Property __width = 292.75 AutoReadOnly
-float Property __height = 25.25 AutoReadOnly
-float Property __x = 57.85 AutoReadOnly
-float Property __y = 653.8 AutoReadOnly
+float Property __height = 31.1 AutoReadOnly
+float Property __x = 56.95 AutoReadOnly
+float Property __y = 648.35 AutoReadOnly
+; have to manipulate alpha here, vanilla already makes use of _visible
+float Property _magickaAlpha = 100.0 AutoReadOnly
 
 ; Variables for Frenzy Buff
 NNLunarTransform Lunar
@@ -37,15 +39,20 @@ Event OnWidgetReset()
   Bloodlust = Game.GetFormFromFile(0x8F5, "NightmareNight.esp") as Perk
   IsWerewolf = Lunar.WWQ.IsWerewolf
 
-  If(Game.GetPlayer().HasSpell(BloodFrenzySpell))
+  Actor Player = Game.GetPlayer()
+  If(Player.HasSpell(BloodFrenzySpell))
     ; While caching would certainly be interesting, its a lot of work as I had to properly store the
     ; current progression of the bar somewhere, which I do not and - to my knowledge - cannot, 
     ; thus simply resetting Frenzy should be the more reliable step to take
     FrenzyEnd("", "", 0, none)
   EndIf
+  If(Player.HasKeyword(Lunar.WerebeastKeyword) || Player.HasMagicEffectWithKeyword(Lunar.WWQ.NightmareRequiem))
+    UI.SetNumber("HUD Menu", "_root.HUDMovieBaseInstance.Magica._alpha", 0)
+  EndIf
 
   RegisterForModEvent("NightmareNightFrenzyStart", "FrenzyStart")
   RegisterForModEvent("NightmareNightFrenzyEnd", "FrenzyEnd")
+  RegisterForModEvent("NightmareNightFrenzyKill", "FrenzyKill")
 EndEvent
 
 Event FrenzyStart(string asEventName, string asStringArg, float level, form akSender)
@@ -97,16 +104,19 @@ Event FrenzyEnd(string asEventName, string asStringArg, float afNumArg, form akS
   Lunar.WWQ.FrenzyStacks.SetValue(0)
 EndEvent
 
+Event FrenzyKill(string asEventName, string asStringArg, float afNumArg, form akSender)
+  Debug.Trace("NIGHTMARE NIGHT - Frenzy Kill")
+  ; endfrenzy():Void
+  UI.Invoke("HUD Menu", WidgetRoot + ".endfrenzy")
+  If(afNumArg)
+    UI.SetNumber("HUD Menu", "_root.HUDMovieBaseInstance.Magica._alpha", _magickaAlpha)
+  EndIf
+EndEvent
+
 Event OnMenuOpen(string menuName)
-  ; If(menuName != "MessageBoxMenu")
-  ;   Debug.MessageBox("Menu opened!")
-  ; EndIf
   ; pausefrenzy(pause:Boolean):Void
   UI.InvokeBool("HUD Menu", WidgetRoot + ".pausefrenzy", true)
   Utility.Wait(0.05)
-  ; If(menuName != "MessageBoxMenu")
-  ;   Debug.MessageBox("Menu closed!")
-  ; EndIf
   UI.InvokeBool("HUD Menu", WidgetRoot + ".pausefrenzy", false)
 EndEvent
 

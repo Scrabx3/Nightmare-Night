@@ -29,7 +29,7 @@ Event OnEffectStart(Actor akTarget, Actor akCaster)
   Utility.Wait(0.5)
   NightmareRequiemIntroImod.PopTo(NightmareRequiemImod)
   ; Inherit WW Abilities
-  akTarget.AddSpell(RequiemDispel)
+  akTarget.AddSpell(RequiemDispel, false)
   akTarget.EquipSpell(RequiemDispel, 2)
   int i = 0
   While(i < WWAbilities.Length)
@@ -57,6 +57,9 @@ Event OnEffectStart(Actor akTarget, Actor akCaster)
   If(right != none)
     akTarget.UnequipSpell(right, 1)
   EndIf
+  
+  ; Thus no point seeing your magicka bar either.. :)
+  UI.SetNumber("HUD Menu", "_root.HUDMovieBaseInstance.Magica._alpha", 0)
 
   ; Set up Frenzy if you got Wrath
   If(akTarget.HasPerk(Wrath))
@@ -83,6 +86,9 @@ Event OnEffectFinish(Actor akTarget, Actor akCaster)
     akTarget.RemoveSpell(WWAbilities[i])
     i += 1
   EndWhile
+
+  ; Also no Frenzy
+  akTarget.SendModEvent("NightmareNightFrenzyKill", numArg = 1.0)
 
   ; misc stuff
   NightmareRequiemImod.PopTo(NightmareRequiemOutroImot)

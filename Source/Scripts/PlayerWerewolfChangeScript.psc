@@ -215,6 +215,9 @@ Function PrepShift()
   Game.DisablePlayerControls(abMovement = false, abFighting = false, abCamSwitch = true, abMenu = false, abActivate = false, abJournalTabs = false, aiDisablePOVType = 1)
   Game.ForceThirdPerson()
   Game.ShowFirstPersonGeometry(false)
+
+  ; Disable Magicka Bar
+  UI.SetNumber("HUD Menu", "_root.HUDMovieBaseInstance.Magica._alpha", 0)
 EndFunction
 
 ; Called from Stage1 (e.g. when Transform Script completes)
@@ -481,6 +484,8 @@ Function Feed(Actor victim)
   player.PlayIdle(SpecialFeeding)
   ; This is for adding a spell that simulates bleeding
   BleedingFXSpell.Cast(victim, victim)
+  ; Reset Frenzy
+  SendModEvent("NightmareNightFrenzyKill")
   ; Extend Transformation Time
   If(!C03Rampage.IsRunning())
     float addShiftTime = __feedExtensionTime
@@ -584,6 +589,9 @@ Function ActuallyShiftBackIfNecessary()
     TransformFX02.Play(Player)
     Utility.Wait(1)
   EndIf
+
+  ; Reset Frenzy..
+  SendModEvent("NightmareNightFrenzyKill", numArg = 1.0)
 
   ; make sure the transition armor is gone. We RemoveItem here, because the SetRace stored all equipped items
   ; at that time, and we equip this armor prior to setting the player to a beast race. When we switch back,
