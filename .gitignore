@@ -4,4 +4,5 @@ meta.ini
 src/HUDWidgets/.settings
 src/HUDWidgets/.actionScriptProperties
 src/HUDWidgets/.project
+src/HUDWidgets/AuthortimeSharedAssets.fla
 *.code-workspace
