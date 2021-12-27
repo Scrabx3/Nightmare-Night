@@ -1,4 +1,7 @@
 meta.ini
 .release
 .vscode
+src\HUDWidgets\.settings
+src\.actionScriptProperties
+src\.project
 *.code-workspace
