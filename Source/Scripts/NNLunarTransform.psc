@@ -56,27 +56,27 @@ Event OnUpdateGameTime()
   ;   HungerLastFeed.Value = daysPassed
   ;   hoursTillHunger = 24
   ; EndIf
-
-  If(MCM.bLunarEnable && g >= 19.00 || g < 1.00)
+  If(g >= 20.00 || g < 1.00)
     float moonphase = GetMoonphase()
     int moonphaseINT = moonphase as int
     If(moonphase < 1 && !(moonphase > 0 && moonphase < 0.5))
       ; Fullmoon 1st or 3rd day
       moonphase = 8
     EndIf
-    MoonPhaseNotifies[moonphaseINT].Show()
-    If(Utility.RandomFloat(0, 99.9) < MCM.LunarChances[moonphaseINT])
-      ; Dont transform if were already shifted..
-      If(Game.GetPlayer().HasKeyword(WerebeastKeyword))
-        WWQ.ExtendToDawn()
-        GoToState("SpawnSpirits")
-      Else
-        GoToState("Transform")
+    If(MCM.bLunarEnable)
+      MoonPhaseNotifies[moonphaseINT].Show()
+      If(Utility.RandomFloat(0, 99.9) < MCM.LunarChances[moonphaseINT])
+        ; Dont transform if were already shifted..
+        If(Game.GetPlayer().HasKeyword(WerebeastKeyword))
+          WWQ.ExtendToDawn()
+          GoToState("SpawnSpirits")
+        Else
+          GoToState("Transform")
+        EndIf
+        return ; next Update is handled by Werewolf Quest
       EndIf
-      return ; next Update is handled by Werewolf Quest
     ElseIf(!IsPreySpawned)
       GoToState("SpawnSpirits")
-      return
     EndIf
   ElseIf(IsPreySpawned)
     DespawnSpiritPrey()
@@ -90,10 +90,10 @@ Function CreateNextUpdate()
   float update
   If(g < 5.0)
     update = 5.0 - g
-  ElseIf(g > 19)
+  ElseIf(g > 20)
     update = 29.0 - g
   Else
-    update = 19.0 - g
+    update = 20.0 - g
   EndIf
   If(update < 0.025)
     update = 0.025
@@ -112,11 +112,11 @@ float Function TimeTill21()
     ElseIf(fg < 0.03)
       fg = 0.03
     EndIf
-    Debug.Trace("NIGHTMARE NIGHT - GameHour = " + gh + "TimeTill21 = " + fg)
+    ; Debug.Trace("NIGHTMARE NIGHT - GameHour = " + gh + "TimeTill21 = " + fg)
     return fg
   Else
     ; 21.00 and 1.00
-    Debug.Trace("NIGHTMARE NIGHT - GameHour = " + gh + "TimeTill21 = 0.025")
+    ; Debug.Trace("NIGHTMARE NIGHT - GameHour = " + gh + "TimeTill21 = 0.025")
     return 0.025
   EndIf
 EndFunction
@@ -128,7 +128,11 @@ State SpawnSpirits
   EndEvent
 
   Event OnUpdateGameTime()
-    SpawnSpiritPrey()
+    ; In case the Player waited this time and its no longer night..
+    float h = GameHour.Value
+    If(h <= 1 || h >= 21)
+      SpawnSpiritPrey()
+    EndIf
     GoToState("")
     CreateNextUpdate()
   EndEvent
@@ -149,7 +153,7 @@ State Transform
       ; if at 20.xx, transform the player between now and 21.00
       t = Utility.RandomFloat(0.025, t)
     EndIf
-    Debug.Trace("NIGHTMARE NIGHT - Transformation in = " + t)
+    ; Debug.Trace("NIGHTMARE NIGHT - Transformation in = " + t)
     RegisterForSingleUpdateGameTime(t)
     ; float gh = GameHour.Value
     ; float fg = 1 - gh + (gh as int)
@@ -160,6 +164,13 @@ State Transform
   EndEvent
 
   Event OnUpdateGameTime()
+    ; In case the Player waited this time and its no longer night..
+    float h = GameHour.Value
+    If(h > 1 && h < 21)
+      GoToState("")
+      CreateNextUpdate()
+      return
+    EndIf  
     SpawnSpiritPrey()
     LunarTransform = true
     int imod = 2 ; HungerLevel.GetValueInt()

@@ -373,14 +373,21 @@ Function StartTracking()
 
   ; calculate when the player turns back into a pumpkin
   float currentTime = GameDaysPassed.GetValue()
+  float currentHour = currentTime - (currentTime as int)
+  ; Debug.Trace("NIGHTMARE NIGHT - currentTime = " + currentTime + " currentHour = " + currentHour)
+  ; Papyrus is incapable of dividing 2 constants...
+  float twenty = 0.8333 ;334 ; 20. / 24.0
+  float two = 0.0833 ;3334 ;2.0 / 24.0
+  bool nighttime = currentHour > twenty || currentHour < two 
+  ; Debug.Trace("NIGHTMARE NIGHT - nighttime = " + nighttime)
   float regressTime
-  If(Lunar.LunarTransform || Player.HasPerk(NightmareNight) && LunarPhase.Value > -1)
+  If(nighttime && (Lunar.LunarTransform || Player.HasPerk(NightmareNight)))
     ; If this is a Lunar Shift or Nightmare Night at Night, override the default Duration. Stay transformed until 5am
-    float fiveam = 5/24
-    regressTime = (currentTime as int) + fiveam
-    If(currentTime - currentTime as int > fiveam)
-      ; If still one the previous day, increase timer by 1
-      regressTime += 1
+    float fiveam = 0.2083 ;33333
+    regressTime = currentTime - currentHour + fiveam
+    If(currentHour > twenty)
+      ; if evening, set transform back time to the following day
+      regressTime += 1.0
     EndIf
   Else
     regressTime = currentTime + RealTimeSecondsToGameTimeDays(StandardDurationSeconds)
