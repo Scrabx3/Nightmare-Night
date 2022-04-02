@@ -32,6 +32,8 @@ int Property iNPCTex Auto Hidden
 ; int Property WolfIndex = 0 Auto Hidden
 String[] BearTextures
 int Property BearIndex = 1 Auto Hidden
+; -- UI
+bool Property bHideMagicka = true Auto Hidden
 ; -- Debug
 String[] Werebeasts
 int iSetRace
@@ -128,9 +130,12 @@ Event OnPageReset(string a_page)
   ; AddMenuOptionST("WerewolfTex", "$NN_WerewolfTex", WolfTextures[WolfIndex]) ; Waiting for Perms on this one
   AddMenuOptionST("WerebearTex", "$NN_WerebearTex", BearTextures[BearIndex])
   AddEmptyOption()
+  AddHeaderOption("$NN_UI")
+  AddToggleOptionST("HideMagicka", "$NN_HideMagicka", bHideMagicka)
+  AddEmptyOption()
+  AddEmptyOption()
+  AddEmptyOption()
   AddHeaderOption("$NN_Debug")
-  iSetRace = Math.abs(IsWerewolf.GetValueInt() - 1) as int
-  AddMenuOptionST("SetRace", "$NN_SetRace", Werebeasts[iSetRace])
   AddTextOptionST("TurnWerebeast", "$NN_TurnWerebeast", "")
   AddTextOptionST("CureWerebeast", "$NN_CureWerebeast", "")
   SetCursorPosition(1)
@@ -147,6 +152,9 @@ Event OnPageReset(string a_page)
     AddSliderOptionST("LunarChance_" + n, "$NN_LunarChance_" + n, LunarChances[n], "{1}%", flag)
     i += 1
   EndWhile
+  AddHeaderOption("$NN_Debug")
+  iSetRace = Math.abs(IsWerewolf.GetValueInt() - 1) as int
+  AddMenuOptionST("SetRace", "$NN_SetRace", Werebeasts[iSetRace])
 EndEvent
 
 ; =============================================================
@@ -350,6 +358,21 @@ State LunarPreset
   EndEvent
   Event OnHighlightST()
     SetInfoText("$NN_LunarPresetHighlight")
+  EndEvent
+EndState
+
+; ================= UI
+State HideMagicka
+  Event OnSelectST()
+    bHideMagicka = !bHideMagicka
+    SetToggleOptionValueST(bHideMagicka)
+  EndEvent
+  Event OnDefaultST()
+    bHideMagicka = true
+    SetToggleOptionValueST(bHideMagicka)
+  EndEvent
+  Event OnHighlightST()
+    SetInfoText("$NN_HideMagickaHighlight")
   EndEvent
 EndState
 

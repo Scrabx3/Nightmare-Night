@@ -548,7 +548,7 @@ Event OnAnimationEvent(ObjectReference akSource, string asEventName)
   if (asEventName == "TransformToHuman")
     ActuallyShiftBackIfNecessary()
   ElseIf(asEventName == "WeaponSwing") || (asEventName == "WeaponLeftSwing")
-    DestroyObjSpell.Cast(Game.GetPlayer())
+    DestroyObjSpell.Cast(Game.GetPlayer(), none)
   endif
 EndEvent
 

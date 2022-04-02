@@ -47,7 +47,7 @@ Event OnWidgetReset()
     FrenzyEnd("", "", 0, none)
   EndIf
   If(Player.HasKeyword(Lunar.WerebeastKeyword) || Player.HasMagicEffectWithKeyword(Lunar.WWQ.NightmareRequiem))
-    UI.SetNumber("HUD Menu", "_root.HUDMovieBaseInstance.Magica._alpha", 0)
+    DisplayMagicka(false)
   EndIf
 
   RegisterForModEvent("NightmareNightFrenzyStart", "FrenzyStart")
@@ -108,9 +108,7 @@ Event FrenzyKill(string asEventName, string asStringArg, float afNumArg, form ak
   Debug.Trace("NIGHTMARE NIGHT - Frenzy Kill")
   ; endfrenzy():Void
   UI.Invoke("HUD Menu", WidgetRoot + ".endfrenzy")
-  If(afNumArg)
-    UI.SetNumber("HUD Menu", "_root.HUDMovieBaseInstance.Magica._alpha", _magickaAlpha)
-  EndIf
+  DisplayMagicka(afNumArg)
 EndEvent
 
 Event OnMenuOpen(string menuName)
@@ -119,4 +117,16 @@ Event OnMenuOpen(string menuName)
   Utility.Wait(0.05)
   UI.InvokeBool("HUD Menu", WidgetRoot + ".pausefrenzy", false)
 EndEvent
+
+Function DisplayMagicka(bool display)
+  NNMCM MCM = (Self as Quest) as NNMCM
+  If(!MCM.bHideMagicka && !display)
+    return
+  EndIf
+  float set = 0
+  If(display)
+    set = _magickaAlpha
+  EndIf
+  UI.SetNumber("HUD Menu", "_root.HUDMovieBaseInstance.Magica._alpha", set)
+EndFunction
 
