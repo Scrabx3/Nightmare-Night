@@ -41,8 +41,8 @@ Event OnUpdateGameTime()
     return
   EndIf
 
-  ; Debug.MessageBox("NIGHTMARE NIGHT - Update Game Time")
   float g = GameHour.Value
+  Debug.Trace("NIGHTMARE NIGHT - Update Game Time at = " + g)
 
   ; float daysPassed = GameDaysPassed.Value
   ; float hoursTillHunger = ((HungerLastFeed.Value + 1) - daysPassed) * 24
@@ -65,17 +65,19 @@ Event OnUpdateGameTime()
     EndIf
     If(MCM.bLunarEnable)
       MoonPhaseNotifies[moonphaseINT].Show()
-      If(Utility.RandomFloat(0, 99.9) < MCM.LunarChances[moonphaseINT])
+      If(Utility.RandomFloat(0, 99.9) < MCM.LunarChances[Math.Floor(moonphase)])
+        Debug.Trace("NIGHTMARE NIGHT - Lunar Transform Trigger with Moon Phase = " + moonphase)
         ; Dont transform if were already shifted..
         If(Game.GetPlayer().HasKeyword(WerebeastKeyword))
           WWQ.ExtendToDawn()
           GoToState("SpawnSpirits")
         Else
-          GoToState("Transform")
+          GoToState("Transform") ; Spawns Spirit Prey
         EndIf
-        return ; next Update is handled by Werewolf Quest
+        return
       EndIf
-    ElseIf(!IsPreySpawned)
+    EndIf
+    If(!IsPreySpawned)
       GoToState("SpawnSpirits")
     EndIf
   ElseIf(IsPreySpawned)
@@ -89,11 +91,11 @@ Function CreateNextUpdate()
   float g = GameHour.Value
   float update
   If(g < 5.0)
-    update = 5.0 - g
+    update = 5.0 - g ; This days 5.00
   ElseIf(g > 20)
-    update = 29.0 - g
+    update = 29.0 - g ; Following days 5.00
   Else
-    update = 20.0 - g
+    update = 20.0 - g ; This days 20.00
   EndIf
   If(update < 0.025)
     update = 0.025
@@ -101,22 +103,18 @@ Function CreateNextUpdate()
   RegisterForSingleUpdateGameTime(update)
 EndFunction
 
+; Assume this to only be called between 20.00 and 1.00
 float Function TimeTill21()
   float gh = GameHour.Value
   If(gh < 21.00)
-    ; If were below 21.00, figure out when 21.00 is
-    float fg =  1 - gh + (gh as int)
-    If(gh < 20)
-      ; If below 20.00, (its til full hour + 1) until 21.00
-      fg += 1
-    ElseIf(fg < 0.03)
-      fg = 0.03
+    float till_21 = 21.00 - gh
+    If(till_21 < 0.025)
+      till_21 = 0.025
     EndIf
-    ; Debug.Trace("NIGHTMARE NIGHT - GameHour = " + gh + "TimeTill21 = " + fg)
-    return fg
-  Else
-    ; 21.00 and 1.00
-    ; Debug.Trace("NIGHTMARE NIGHT - GameHour = " + gh + "TimeTill21 = 0.025")
+    Debug.Trace("NIGHTMARE NIGHT - GameHour = " + gh + "TimeTill21 = " + till_21)
+    return till_21
+  Else ; 21.00 and 1.00
+    Debug.Trace("NIGHTMARE NIGHT - GameHour = " + gh + "TimeTill21 = 0.025")
     return 0.025
   EndIf
 EndFunction
@@ -128,9 +126,8 @@ State SpawnSpirits
   EndEvent
 
   Event OnUpdateGameTime()
-    ; In case the Player waited this time and its no longer night..
     float h = GameHour.Value
-    If(h <= 1 || h >= 21)
+    If(h <= 1 || h >= 21) ; Check time window, in case player waited
       SpawnSpiritPrey()
     EndIf
     GoToState("")
@@ -140,33 +137,18 @@ EndState
 
 State Transform
   Event OnBeginState()
-    ; Earliest Time to transform is between 20 and 21
+    ; Called between 20.00 and 1.00
     float t = TimeTill21()
-    If(t == 0.025)
-      ; if past 21, spawn Spirit Prey & transform in the next hour
-      SpawnSpiritPrey()
-      t = Utility.RandomFloat(0.5, 1.0)
-    ElseIf(t > 1)
-      ; if still 19.xx, transform the player between 20.00 and 21.00
-      t = Utility.RandomFloat(t - 1, t)
-    Else
-      ; if at 20.xx, transform the player between now and 21.00
-      t = Utility.RandomFloat(0.025, t)
+    If(t > 0.025) ; Somewhere 20.xx; Randomize & shift interval
+      t = Utility.RandomFloat(0.025, t) + 0.75 ; ..between 20.45 & 21.45
     EndIf
-    ; Debug.Trace("NIGHTMARE NIGHT - Transformation in = " + t)
+    Debug.Trace("NIGHTMARE NIGHT - Transformation in = " + t)
     RegisterForSingleUpdateGameTime(t)
-    ; float gh = GameHour.Value
-    ; float fg = 1 - gh + (gh as int)
-    ; fg = Utility.RandomFloat(fg, fg + 1.0)
-    ; ; Update will be somewhere within the next full hour (e.g. if cur time 19.xx transform is between 20.00 and 21.00)
-    ; RegisterForSingleUpdateGameTime(fg)
-    ; Debug.MessageBox("NIGHTMARE NIGHT - Update in " + fg)
   EndEvent
 
   Event OnUpdateGameTime()
-    ; In case the Player waited this time and its no longer night..
     float h = GameHour.Value
-    If(h > 1 && h < 21)
+    If(h > 2 && h < 20) ; Player waited past time window
       GoToState("")
       CreateNextUpdate()
       return
@@ -193,7 +175,7 @@ State Transform
     Utility.Wait(time) ; Waiting the RampUp Time
     LunarTransformNotify.Show()
     LunarTransformSpell.Cast(Game.GetPlayer())
-    ; Reenabling Polling after Transformation ends
+    ; Next Update schedule is made by the WW Quest
     GoToState("")
   EndEvent
 EndState

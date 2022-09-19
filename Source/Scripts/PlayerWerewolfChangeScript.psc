@@ -168,6 +168,18 @@ Function SetObjectManagerObjects()
   DefObjMananager.SetForm("RIVS", WerewolfAbilities)
 EndFunction
 
+float Function GetTimeFollowingMorning()
+  float currentTime = GameDaysPassed.GetValue()
+  float currentDay = Math.floor(currentTime)
+  float currentHour = currentTime - currentDay
+  float five = 0.2083 ; = 5.00 / 24.00
+  float nextmorning = currentDay + five
+  If(currentHour > five) ; If current day is already past the deadline, set to the next day
+    nextmorning += 1.0
+  EndIf
+  return nextmorning
+EndFunction
+
 ; =============================================================
 ; =============================== TRANSFORMATION
 ; =============================================================
@@ -375,26 +387,19 @@ Function StartTracking()
   float currentTime = GameDaysPassed.GetValue()
   float currentHour = currentTime - (currentTime as int)
   ; Debug.Trace("NIGHTMARE NIGHT - currentTime = " + currentTime + " currentHour = " + currentHour)
-  ; Papyrus is incapable of dividing 2 constants...
-  float twenty = 0.8333 ;334 ; 20. / 24.0
-  float two = 0.0833 ;3334 ;2.0 / 24.0
-  bool nighttime = currentHour > twenty || currentHour < two 
+  ; Papyrus is incapable to divide 2 constants...
+  bool nighttime = currentHour > 0.8333 ;/ 20.00 / 24.00 /; || currentHour < 0.0833 ; 2.00 / 24.00
   ; Debug.Trace("NIGHTMARE NIGHT - nighttime = " + nighttime)
   float regressTime
   If(nighttime && (Lunar.LunarTransform || Player.HasPerk(NightmareNight)))
     ; If this is a Lunar Shift or Nightmare Night at Night, override the default Duration. Stay transformed until 5am
-    float fiveam = 0.2083 ;33333
-    regressTime = currentTime - currentHour + fiveam
-    If(currentHour > twenty)
-      ; if evening, set transform back time to the following day
-      regressTime += 1.0
-    EndIf
+    regressTime = GetTimeFollowingMorning()
   Else
     regressTime = currentTime + RealTimeSecondsToGameTimeDays(StandardDurationSeconds)
   EndIf
+  Debug.Trace("NIGHTMARE NIGHT - WEREWOLF: currentTime = " + currentTime)
+  Debug.Trace("NIGHTMARE NIGHT - WEREWOLF: regressTime = " + regressTime)
   PlayerWerewolfShiftBackTime.SetValue(regressTime)
-  ; Debug.Trace("NIGHTMARE NIGHT - WEREWOLF: Current day -- " + currentTime)
-  ; Debug.Trace("NIGHTMARE NIGHT - WEREWOLF: Player will turn back at day " + regressTime)
 
   ; increment stats
   Game.IncrementStat("Werewolf Transformations")
@@ -420,20 +425,17 @@ EndFunction
 ; =============================================================
 
 Event OnUpdate()
-  Actor Player = Game.GetPlayer()
-  ; If(!Player.HasMagicEffectWithKeyword(FrenzyKeyword))
-  ;   ; Debug.Trace("NIGHTMARE NIGHT: Resetting Frenzy Tick -- Level = " + FrenzyStacks.Value)
-  ;   FrenzyStacks.Value = 0
-  If(Player.HasPerk(Wrath) && Player.HasMagicEffectWithKeyword(BloodFrenzyKeyword))
-    return
-  EndIf
-
   If(Untimed)
     return
   EndIf
 
+  Actor Player = Game.GetPlayer()
+  If(Player.HasPerk(Wrath) && Player.HasMagicEffectWithKeyword(BloodFrenzyKeyword))
+    return
+  EndIf
+
   ; Debug.Trace("WEREWOLF: NumWerewolfPerks = " + Game.QueryStat("NumWerewolfPerks") + "/" + DLC1WerewolfMaxPerks.Value)
-  If(Game.QueryStat("NumWerewolfPerks") >= DLC1WerewolfMaxPerks.Value) ; !IMPORTANT keep this Stat updated
+  If(Game.QueryStat("NumWerewolfPerks") >= DLC1WerewolfMaxPerks.Value)
     debug.trace("WEREWOLF: achievement granted")
     ; Game.AddAchievement(57)
   EndIf
@@ -441,7 +443,7 @@ Event OnUpdate()
   float currentTime = GameDaysPassed.GetValue()
   float regressTime = PlayerWerewolfShiftBackTime.GetValue()
   If(GetStageDone(20) == 1)
-    If((currentTime >= regressTime) && (!Player.IsInKillMove()) && !__tryingToShiftBack)
+    If(currentTime >= regressTime && !Player.IsInKillMove() && !__tryingToShiftBack)
       UnregisterForUpdate()
       SetStage(100) ; time to go, buddy
     EndIf
@@ -467,13 +469,7 @@ EndFunction
 
 ; Called by Lunar Transform if were shifted while a Lunar Shift triggers. Extending duration of the Shift till dawn
 Function ExtendToDawn()
-  float currentTime = GameDaysPassed.GetValue()
-  float fiveam = 5/24
-  float regressTime = (currentTime as int) + fiveam
-  If(currentTime - currentTime as int > fiveam)
-    ; If still one the previous day, increase timer by 1
-    regressTime += 1
-  EndIf
+  float regressTime = GetTimeFollowingMorning()
   PlayerWerewolfShiftBackTime.SetValue(regressTime)
   LunarExtendTime.Show()
   ; Debug.Trace("NIGHTMARE NIGHT - WEREWOLF: Current day -- " + currentTime)
