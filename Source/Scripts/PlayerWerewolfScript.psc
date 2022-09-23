@@ -2,8 +2,6 @@ Scriptname PlayerWerewolfScript extends ReferenceAlias
 
 Race Property WerewolfBeastRace auto
 Race Property WerebearBeastRace Auto
-Quest owned
-
 
 Event OnRaceSwitchComplete()
 	Race myRace = GetActorReference().GetRace()
@@ -19,10 +17,6 @@ Event OnRaceSwitchComplete()
 EndEvent
 
 State NoEquipping
-	Event OnBeginState()
-		owned = GetOwningQuest()
-	EndEvent
-
 	Event OnObjectEquipped(Form akBaseObject, ObjectReference akReference)
 		; Dont allow the Player to equip anything while in Beastform..
 		Race myRace = GetActorReference().GetRace()

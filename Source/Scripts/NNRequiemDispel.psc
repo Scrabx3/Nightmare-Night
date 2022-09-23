@@ -1,1 +1,0 @@
-Scriptname NNRequiemDispel extends ActiveMagicEffect  

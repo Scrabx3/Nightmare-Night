@@ -35,9 +35,7 @@ bool IsPreySpawned = false
 Event OnUpdateGameTime()
   If(Game.GetPlayer().HasSpell(MCM.WerewolfImmunity) == false)
     ; Nothing to do if the Player isnt a Werebeast
-    ; The cd will be enabled after changing once, so if the player turns through AP or the Companion Questline
-    ; Their forced Transformation will do the starting here
-    ; If he turns through NN, the Cd is started through there. Otherwise idk. Just transform I guess :<
+    ; Update will be re-registered after transforming to a WW once
     return
   EndIf
 
@@ -66,7 +64,7 @@ Event OnUpdateGameTime()
     If(MCM.bLunarEnable)
       MoonPhaseNotifies[moonphaseINT].Show()
       If(Utility.RandomFloat(0, 99.9) < MCM.LunarChances[Math.Floor(moonphase)])
-        Debug.Trace("NIGHTMARE NIGHT - Lunar Transform Trigger with Moon Phase = " + moonphase)
+        ; Debug.Trace("NIGHTMARE NIGHT - Lunar Transform Trigger with Moon Phase = " + moonphase)
         ; Dont transform if were already shifted..
         If(Game.GetPlayer().HasKeyword(WerebeastKeyword))
           WWQ.ExtendToDawn()
@@ -106,15 +104,15 @@ EndFunction
 ; Assume this to only be called between 20.00 and 1.00
 float Function TimeTill21()
   float gh = GameHour.Value
-  If(gh < 21.00)
+  If(gh < 21.00 && gh > 1.0)
     float till_21 = 21.00 - gh
     If(till_21 < 0.025)
       till_21 = 0.025
     EndIf
-    Debug.Trace("NIGHTMARE NIGHT - GameHour = " + gh + "TimeTill21 = " + till_21)
+    ; Debug.Trace("NIGHTMARE NIGHT - GameHour = " + gh + "TimeTill21 = " + till_21)
     return till_21
   Else ; 21.00 and 1.00
-    Debug.Trace("NIGHTMARE NIGHT - GameHour = " + gh + "TimeTill21 = 0.025")
+    ; Debug.Trace("NIGHTMARE NIGHT - GameHour = " + gh + "TimeTill21 = 0.025")
     return 0.025
   EndIf
 EndFunction
@@ -142,7 +140,7 @@ State Transform
     If(t > 0.025) ; Somewhere 20.xx; Randomize & shift interval
       t = Utility.RandomFloat(0.025, t) + 0.75 ; ..between 20.45 & 21.45
     EndIf
-    Debug.Trace("NIGHTMARE NIGHT - Transformation in = " + t)
+    ; Debug.Trace("NIGHTMARE NIGHT - Transformation in = " + t)
     RegisterForSingleUpdateGameTime(t)
   EndEvent
 
@@ -152,8 +150,12 @@ State Transform
       GoToState("")
       CreateNextUpdate()
       return
-    EndIf  
+    EndIf
     SpawnSpiritPrey()
+    If(WWQ.IsRunning())
+      WWQ.ExtendToDawn()
+      return
+    EndIf
     LunarTransform = true
     int imod = 2 ; HungerLevel.GetValueInt()
     ;/ All Imods have a Rampup time which is dependend on the Hunger Stage which colors the Screen dark red over time

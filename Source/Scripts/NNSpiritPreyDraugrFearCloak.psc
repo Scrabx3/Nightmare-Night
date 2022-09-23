@@ -12,10 +12,10 @@ Event OnEffectStart(Actor akTarget, Actor akCaster)
   ; Player has 5 seconds to stop looking
   break = false
   waited = 0.0
-  While(waited < 5)
+  While(waited < 1)
     Utility.Wait(0.25)
-    waited += 0.25
-    fearImod.Apply(waited/5)
+    waited += 0.05
+    fearImod.Apply(waited)
     If(break)
       fearImod.Remove()
       return
