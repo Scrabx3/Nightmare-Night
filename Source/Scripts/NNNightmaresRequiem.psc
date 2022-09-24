@@ -13,8 +13,6 @@ ImageSpaceModifier Property NightmareRequiemIntroImod Auto
 ImageSpaceModifier Property NightmareRequiemImod Auto
 ImageSpaceModifier Property NightmareRequiemOutroImot Auto
 
-Keyword Property BloodFrenzyKW Auto
-Spell Property BloodFrenzyLv5 Auto
 ;/ =======================================
   Nightmares Requiem
   This is supposed to be some kind of "inbetween" Lycan Transformation. This Script acts as the
@@ -62,13 +60,7 @@ Event OnEffectStart(Actor akTarget, Actor akCaster)
   UI.SetNumber("HUD Menu", "_root.HUDMovieBaseInstance.Magica._alpha", 0)
 
   ; Set up Frenzy if you got Wrath
-  If(akTarget.HasPerk(Wrath))
-    FrenzyStacks.Value = 5
-    SendModEvent("NightmareNightFrenzyStart", "", 5.0)
-    ; BloodFrenzy.Cast(akTarget)
-  Else
-    FrenzyStacks.Value = 0
-  EndIf
+  WWQuest.SetUpFrenzy()
 EndEvent
 
 Event OnEffectFinish(Actor akTarget, Actor akCaster)
@@ -88,7 +80,7 @@ Event OnEffectFinish(Actor akTarget, Actor akCaster)
   EndWhile
 
   ; Also no Frenzy
-  akTarget.SendModEvent("NightmareNightFrenzyKill", numArg = 1.0)
+  akTarget.DispelSpell(BloodFrenzy)
 
   ; misc stuff
   NightmareRequiemImod.PopTo(NightmareRequiemOutroImot)

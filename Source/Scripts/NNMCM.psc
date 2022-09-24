@@ -99,7 +99,7 @@ Event OnConfigInit()
   NPCTextures[2] = "$NN_NPCText_2"
 
   LunarChances = new float[9]
-  SetLunarChances()
+  SetLunarChances(true)
 
   Skinwalker = new float[9]
   Skinwalker[0] = 100
@@ -444,7 +444,7 @@ Function CureWerebeast()
   UnregisterForUpdateGameTime()
 EndFunction
 
-Function SetLunarChances()
+Function SetLunarChances(bool abInitialize = false)
   If(lunarIndex == 0) ; Warg
     LunarChances[0] = 100
     LunarChances[1] = 13
@@ -476,14 +476,16 @@ Function SetLunarChances()
     LunarChances[7] = 75
     LunarChances[8] = 80
   EndIf
-  int flag = getFlag(lunarIndex == 3)
-  int i = 0
-  While(i < LunarChances.Length)
-    String l = "LunarChance_" + i
-    SetOptionFlagsST(flag, i != 7, l)
-    SetSliderOptionValueST(LunarChances[i], "{1}%", i != 7, l)
-    i += 1
-  EndWhile
+  If(!abInitialize)
+    int flag = getFlag(lunarIndex == 3)
+    int i = 0
+    While(i < LunarChances.Length)
+      String l = "LunarChance_" + i
+      SetOptionFlagsST(flag, i != 7, l)
+      SetSliderOptionValueST(LunarChances[i], "{1}%", i != 7, l)
+      i += 1
+    EndWhile
+  EndIf
 EndFunction
 
 int Function getFlag(bool option)

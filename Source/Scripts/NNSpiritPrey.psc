@@ -12,7 +12,6 @@ Function CheckCompletionConditions()
   EndWhile
   Debug.Trace("[Nightmare Night] Completed hunts: " + c)
   If(c * 10 == AllStages)
-    CompleteQuest()
     Stop()
   EndIf
 EndFunction

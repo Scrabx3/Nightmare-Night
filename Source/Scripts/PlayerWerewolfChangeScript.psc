@@ -1,15 +1,6 @@
 Scriptname PlayerWerewolfChangeScript extends Quest  
 {Main Script for Player Werewolf}
 
-;/ 
-!IMPORTANT
-1) Dont edit the Scripts Name
-2) Dont edit the Signature and purpose of "ShiftBack()"
-2) Shifting will start this Quest and this Quest stays active until the Transformation ends
-3) This Quest ends at Stage 100
-4) Setting Stage100 will end the Transformation
-/;
-
 ; =============================== VANILLA PROPERTIES
 float Property StandardDurationSeconds auto
 {How long (in real seconds) the transformation lasts}
@@ -131,8 +122,9 @@ Perk Property Wrath Auto
 Perk Property NightmareNight Auto
 
 GlobalVariable Property FrenzyStacks Auto
-Keyword Property BloodFrenzyKeyword Auto
+MagicEffect Property BloodFrenzyEffect Auto
 Spell Property BloodFrenzySpell Auto
+Perk Property BloodFrenzyPerk Auto
 
 Spell Property DestroyObjSpell Auto
 
@@ -144,6 +136,50 @@ Spell LastEquippedPower
 Form WerebeastFXArmor
 Form Property TransitionArmor Auto Hidden
 Race PlayerRace
+
+; =============================================================
+; =============================== FRENZY
+; =============================================================
+Function SetUpFrenzy()
+  If(Game.GetPlayer().HasPerk(Wrath))
+    FrenzyStacks.SetValueInt(5)
+    SetFrenzyStats(5)
+    CastFrenzy()
+  Else
+    FrenzyStacks.SetValueInt(0)
+  EndIf
+EndFunction
+
+Function ApplyFrenzy(int aiLevelUp)
+  int level = FrenzyStacks.GetValueInt() + aiLevelUp
+  If level > 10
+    level = 10
+  EndIf
+  FrenzyStacks.SetValueInt(level)
+  SetFrenzyStats(level)
+  CastFrenzy()
+EndFunction
+
+Function SetFrenzyStats(int aiLevel)
+  int ww = IsWerewolf.GetValueInt()
+  float dmg = (0.1 - 0.025 * ww) * aiLevel
+  float spd = (0.025 + 0.035 * ww) * aiLevel
+  float def = 0.05 * aiLevel
+  ; Debug.Trace("[NIGHTMARE NIGHT] - Blood Frenzy Stats Update - damage = " + dmg + "; speed = " + spd + "; defense = " + def)
+
+  BloodFrenzyPerk.SetNthEntryValue(0, 1, dmg) ; Damage
+  BloodFrenzyPerk.SetNthEntryValue(2, 1, spd) ; Speed
+  BloodFrenzyPerk.SetNthEntryValue(4, 0, def) ; Inc Dmg Physical
+  BloodFrenzyPerk.SetNthEntryValue(5, 0, def) ; Inc Dmg Magical
+EndFunction
+
+Function CastFrenzy()
+  If(SKSE.GetPluginVersion("NightmareNight") == -1)
+    ; LE compatiblity, using Flash to start the timer
+    SendModEvent("NightmareNightFrenzyStart", numArg = BloodFrenzySpell.GetNthEffectDuration(0))
+  EndIf
+  BloodFrenzySpell.Cast(Game.GetPlayer())
+EndFunction
 
 ; =============================================================
 ; =============================== UTILITY
@@ -408,13 +444,7 @@ Function StartTracking()
   ; we're done with the transformation handling
   SetStage(10)
   ; add Frenzy Lv5 if player has Wrath
-  If(Player.HasPerk(Wrath))
-    FrenzyStacks.Value = 5
-    SendModEvent("NightmareNightFrenzyStart", "", 5.0)
-    ; BloodFrenzySpell.Cast(Player)
-  Else
-    FrenzyStacks.Value = 0
-  EndIf
+  SetUpFrenzy()
   ; and quick spell for destroying webs..
   RegisterForAnimationEvent(Player, "WeaponSwing")
   RegisterForAnimationEvent(Player, "WeaponLeftSwing")
@@ -430,7 +460,7 @@ Event OnUpdate()
   EndIf
 
   Actor Player = Game.GetPlayer()
-  If(Player.HasPerk(Wrath) && Player.HasMagicEffectWithKeyword(BloodFrenzyKeyword))
+  If(Player.HasPerk(Wrath) && Player.HasMagicEffect(BloodFrenzyEffect))
     return
   EndIf
 
@@ -487,8 +517,6 @@ Function Feed(Actor victim)
   player.PlayIdle(SpecialFeeding)
   ; This is for adding a spell that simulates bleeding
   BleedingFXSpell.Cast(victim, victim)
-  ; Reset Frenzy
-  SendModEvent("NightmareNightFrenzyKill")
   ; Extend Transformation Time
   If(!C03Rampage.IsRunning())
     float addShiftTime = __feedExtensionTime
@@ -505,14 +533,13 @@ Function Feed(Actor victim)
     ; Debug.Trace("NIGHTMARE NIGHT: Player feeding -- new regress day is " + PlayerWerewolfShiftBackTime.Value)
   EndIf
   ; Progress Hunger
-  Feedings.Value += 1
-  LastFeeding.Value = GameDaysPassed.Value
-  If(Feedings.Value > Math.pow(2, HungerLevel.Value + 1))
-    ; Debug.Trace("NIGHTMARE NIGHT: Progressing Player Hunger -- Level = " + HungerLevel.Value + ", Feedings = " + Feedings.Value)
-    HungerLevel.Value += 1
-    Feedings.Value = 0
-    Lunar.ManageHunger()
-  EndIf
+  ; Feedings.Value += 1
+  ; LastFeeding.Value = GameDaysPassed.Value
+  ; If(Feedings.Value > Math.pow(2, HungerLevel.Value + 1))
+  ;   ; Debug.Trace("NIGHTMARE NIGHT: Progressing Player Hunger -- Level = " + HungerLevel.Value + ", Feedings = " + Feedings.Value)
+  ;   HungerLevel.Value += 1
+  ;   Feedings.Value = 0
+  ; EndIf
   SetStage(10)
 EndFunction
 
@@ -594,7 +621,7 @@ Function ActuallyShiftBackIfNecessary()
   EndIf
 
   ; Reset Frenzy..
-  SendModEvent("NightmareNightFrenzyKill", numArg = 1.0)
+  Player.DispelSpell(BloodFrenzySpell)
 
   ; make sure the transition armor is gone. We RemoveItem here, because the SetRace stored all equipped items
   ; at that time, and we equip this armor prior to setting the player to a beast race. When we switch back,

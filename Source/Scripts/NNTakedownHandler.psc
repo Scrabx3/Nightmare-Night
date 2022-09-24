@@ -1,7 +1,6 @@
 Scriptname NNTakedownHandler extends ActiveMagicEffect  
 
-GlobalVariable Property FrenzyStacks Auto
-Spell Property BloodFrenzySpell Auto
+PlayerWerewolfChangeScript Property WWQ Auto
 Perk Property NightmareNight Auto
 
 GlobalVariable Property DLC1WerewolfFeedPoints Auto
@@ -18,16 +17,8 @@ GlobalVariable Property DLC1WerewolfTotalPerksEarned Auto
 Message Property DLC1FeedPointsMsg Auto
 Message Property DLC1WerewolfPerkEarned Auto
 
-
-Actor me ; I cache this cause bad experiences with GetTargetActor() returning none after said target Actor dies, idk
-Event OnEffectStart(Actor akTarget, Actor akCaster)
-  me = akTarget
-EndEvent
-
 Event OnDying(Actor akKiller)
-  Actor Player = Game.GetPlayer()
-  If(akKiller != Player)
-    ; We only care about Playerkills
+  If(akKiller != Game.GetPlayer())
     return
   EndIf
   ;/ =======================================
@@ -54,29 +45,7 @@ Event OnDying(Actor akKiller)
     The purpose of this Block here is only the count up & maintain the Buff
     whenver something dies
   ======================================= /;
-  ; Debug.Trace("NIGHTMARE NIGHT: Stacking Bloodrush -- Current Level = " + FrenzyStacks.GetValueInt())
-  float frenzy = FrenzyStacks.Value + 1
-  If(Player.HasPerk(NightmareNight))
-    frenzy += 1
-  EndIf
-  FrenzyStacks.Value = frenzy
-  me.SendModEvent("NightmareNightFrenzyStart", "", frenzy)
-  ; BloodFrenzySpell.Cast(Player)
-
-  ; int frenzy = FrenzyStacks.Value as int
-  ; Debug.Trace("NIGHTMARE NIGHT: Stacking Bloodrush -- Current Level = " + frenzy)
-  ; ; Nightmare Night Perk doubles Frenzy gain and grants 10% Hp per Kill. Doing both here to not twice
-  ; If(Player.HasPerk(NightmareNight))
-  ;   Player.RestoreActorValue("Health", Player.GetActorValueMax("Health") * 0.05)
-  ;   frenzy += 1
-  ; EndIf
-  ; If(frenzy < 10)
-  ;   BloodFrenzy[frenzy].Cast(Player)
-  ;   frenzy += 1
-  ; Else ; Theres no Frenzy Lv11+, just refresh Lv10
-  ;   BloodFrenzy[9].Cast(Player)
-  ; EndIf
-  ; FrenzyStacks.Value = frenzy
+  WWQ.ApplyFrenzy(1 + akKiller.HasPerk(NightmareNight) as int)
 EndEvent
 
 

@@ -1,14 +1,6 @@
 Scriptname NNLunarTransform extends Quest
 {Main Cycle Script for Hunger & Lunar Transformation}
 
-;/
-TODO:
-- WW Hunters
-- UI Stuff (FLASH YAY FINALLY)
-
-- Wait for Feedback(?)
-/;
-
 NNMCM Property MCM Auto
 PlayerWerewolfChangeScript Property WWQ Auto
 Keyword Property WerebeastKeyword Auto
@@ -218,26 +210,6 @@ Function DespawnSpiritPrey()
     i += 1
   EndWhile
   IsPreySpawned = false
-EndFunction
-;/ =======================================
-  Hunger System; For every so and so many Feedings gain a few buffs or debuffs. This essentially mimics the Vampire Thirst System.. just different
-  Hunger defines the warn time before a Lunar Transformation happens and includes the following Buffs & Debuffs:
-  === Stage 0
-  Disease Resistance -100% (negated)
-  -50 Max Stamina
-  === Stage 1
-  Disease Resistance -50%
-  === Stage 2
-  === Stage 3
-  +10% Movement Speed in and out of beastform
-======================================= /;
-Function ManageHunger()
-  ; int stage = HungerLevel.GetValueInt()
-  ; TODO: define Hunger Stages here
-  ; NOTE: prbly not going to implement this due to NNs dynamic usually trying to punish you for feeding 
-  ; .. which contradicts with the Hunger Systems attempt to force you into feeding
-  ; Im also not sure what exactly to do with it. I want to avoid exclusively granting Stat Buffs & Debuffs everywhere
-  ; But since Werebeasts have no access to magic or any other traits beyond "incredible physical strength" my options here are somewhat limited
 EndFunction
 
 ;/ =======================================

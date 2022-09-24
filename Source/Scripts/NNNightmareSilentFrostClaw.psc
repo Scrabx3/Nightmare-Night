@@ -1,14 +1,9 @@
 Scriptname NNNightmareSilentFrostClaw extends ActiveMagicEffect  
 
 Event OnEffectStart(Actor akTarget, Actor akCaster)
-  ; The Effect is applied when you got Nightmare of the Silent Night or Nightmare Night. Nightmare Night only shreds half Stamina & Magicka though
-  If(akTarget.IsDead())
-    Debug.MessageBox("It ded m8")
-    return
-  ElseIf(akCaster.IsDetectedBy(akTarget))
-    Debug.MessageBox("It see me m8")
+  If(akTarget.IsDead() || akCaster.IsDetectedBy(akTarget)) ; Script still triggers if attack kills target
     return
   EndIf
-  akTarget.DamageActorValue("Stamina", akTarget.GetActorValue("Stamina"))
-  akTarget.DamageActorValue("Magicka", akTarget.GetActorValue("Magicka"))
+  akTarget.DamageActorValue("Stamina", 1000.0)
+  akTarget.DamageActorValue("Magicka", 1000.0)
 EndEvent
