@@ -34,10 +34,13 @@ Event OnWidgetReset()
   RegisterForMenu("MessageBoxMenu")
   RegisterForMenu("Console")
   RegisterForMenu("Console Native UI Menu")
+
   RegisterForModEvent("NightmareNightFrenzyStart", "FrenzyStart")
 EndEvent
 
 Event FrenzyStart(string asEventName, string asStringArg, float afDuration, form akSender)
+  UI.SetNumber("HUD Menu", "_root.HUDMovieBaseInstance.Magica._alpha", 0)
+
   float[] nf = new float[2]
   nf[0] = afDuration
   nf[1] = 0.0

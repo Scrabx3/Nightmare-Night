@@ -141,6 +141,7 @@ Race PlayerRace
 ; =============================== FRENZY
 ; =============================================================
 Function SetUpFrenzy()
+  Debug.Trace("[NN] Setting up Frenzy")
   If(Game.GetPlayer().HasPerk(Wrath))
     FrenzyStacks.SetValueInt(5)
     SetFrenzyStats(5)
@@ -151,6 +152,7 @@ Function SetUpFrenzy()
 EndFunction
 
 Function ApplyFrenzy(int aiLevelUp)
+  Debug.Trace("[NN] Applying Frenzy, adding " + aiLevelUp + " levels")
   int level = FrenzyStacks.GetValueInt() + aiLevelUp
   If level > 10
     level = 10
@@ -161,6 +163,7 @@ Function ApplyFrenzy(int aiLevelUp)
 EndFunction
 
 Function SetFrenzyStats(int aiLevel)
+  Debug.Trace("[NN] Setting Frenzy to Level " + aiLevel)
   int ww = IsWerewolf.GetValueInt()
   float dmg = (0.1 - 0.025 * ww) * aiLevel
   float spd = (0.025 + 0.035 * ww) * aiLevel
@@ -174,6 +177,7 @@ Function SetFrenzyStats(int aiLevel)
 EndFunction
 
 Function CastFrenzy()
+  Debug.Trace("[NN] Casting Frenzy")
   If(SKSE.GetPluginVersion("NightmareNight") == -1)
     ; LE compatiblity, using Flash to start the timer
     SendModEvent("NightmareNightFrenzyStart", numArg = BloodFrenzySpell.GetNthEffectDuration(0))

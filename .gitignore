@@ -1,8 +1,5 @@
 meta.ini
 .release
 .vscode
-src/HUDWidgets/.settings
-src/HUDWidgets/.actionScriptProperties
-src/HUDWidgets/.project
-src/HUDWidgets/AuthortimeSharedAssets.fla
 *.code-workspace
+*.dll

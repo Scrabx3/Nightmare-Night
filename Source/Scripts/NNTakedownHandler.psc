@@ -18,6 +18,7 @@ Message Property DLC1FeedPointsMsg Auto
 Message Property DLC1WerewolfPerkEarned Auto
 
 Event OnDying(Actor akKiller)
+  Debug.Trace("[NN] Takedown handler kill registered, killer = " + akKiller)
   If(akKiller != Game.GetPlayer())
     return
   EndIf

@@ -55,9 +55,6 @@ Event OnEffectStart(Actor akTarget, Actor akCaster)
   If(right != none)
     akTarget.UnequipSpell(right, 1)
   EndIf
-  
-  ; Thus no point seeing your magicka bar either.. :)
-  UI.SetNumber("HUD Menu", "_root.HUDMovieBaseInstance.Magica._alpha", 0)
 
   ; Set up Frenzy if you got Wrath
   WWQuest.SetUpFrenzy()
