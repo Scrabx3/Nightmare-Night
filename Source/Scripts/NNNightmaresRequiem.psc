@@ -78,6 +78,9 @@ Event OnEffectFinish(Actor akTarget, Actor akCaster)
 
   ; Also no Frenzy
   akTarget.DispelSpell(BloodFrenzy)
+  If(SKSE.GetPluginVersion("NightmareNight") == -1)
+    SendModEvent("NightmareNightFrenzyEnd")
+  EndIf
 
   ; misc stuff
   NightmareRequiemImod.PopTo(NightmareRequiemOutroImot)

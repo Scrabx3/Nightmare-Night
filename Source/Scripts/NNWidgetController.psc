@@ -3,56 +3,58 @@ Scriptname NNWidgetController extends SKI_WidgetBase
 
 String Property MagicaAlpha = "_root.HUDMovieBaseInstance.Magica._alpha" AutoReadOnly
 
-; Override SkyUI. This is legacy support; Abort if the dll is loaded
+; legacy support only, abort if the dll is loaded
 Event OnWidgetManagerReady(string asEventName, string asStringArg, float afNumArg, form akSender)
 	If(SKSE.GetPluginVersion("NightmareNight") > -1)
     return
   EndIf
-  Parent.OnWidgetManagerReady(asEventName, asStringArg, afNumArg, akSender)
-endEvent
+  Debug.Trace("[NIGHTMARE NIGHT] No dll found, loading HUD integrated Widget")
+  parent.OnWidgetManagerReady(asEventName, asStringArg, afNumArg, akSender)
+EndEvent
 
 String Function GetWidgetSource()
   return "./../../NightmareNight.swf"
 EndFunction
 
-; called after each Game Reload
+; called after each Game Reload, so long the dll is NOT installed
 Event OnWidgetReset()
+  Debug.Trace("[NIGHTMARE NIGHT] On widget reset, loading HUD integrated Widget")
   WidgetName = "Nightmare Night"
   
   RegisterForMenu("HUD MENU")
   RegisterForMenu("ContainerMenu")
   RegisterForMenu("Loading Menu")
 
-  ; RegisterForMenu("StatsMenu")
-  ; RegisterForMenu("Journal Menu")
-  ; RegisterForMenu("Loading Menu")
-  ; RegisterForMenu("ContainerMenu")
-  ; RegisterForMenu("FavoritesMenu")
-  ; RegisterForMenu("MessageBoxMenu")
-  ; RegisterForMenu("Console")
-  ; RegisterForMenu("Console Native UI Menu")
-
   RegisterForModEvent("NightmareNightFrenzyStart", "FrenzyStart")
   RegisterForModEvent("NightmareNightFrenzyEnd", "FrenzyEnd")
 EndEvent
 
-; Called by the Papyrus source when the spell is applied
+; Called by the Papyrus source when the spell is first applied
 Event FrenzyStart(string asEventName, string asFrenzyLevel, float afDuration, form akSender)
-  UI.SetNumber("HUD Menu", MagicaAlpha, 0)
+  Debug.Trace("[NIGHTMARE NIGHT] Frenzy Start")
+  Debug.Trace("[NIGHTMARE NIGHT] Invoking " + (WidgetRoot + ".main.show"))
+
+  UI.Invoke("HUD MENU", WidgetRoot + ".main.show")
+  UI.Invoke("HUD MENU", WidgetRoot + ".legacy.show")
   GoToState("Active")
-  
-  UI.InvokeFloat("HUD Menu", WidgetRoot + "legacy.updateMeterDuration", afDuration)
-  UI.InvokeFloat("HUD Menu", WidgetRoot + "main.updateMeterPercent", asFrenzyLevel as int)
-
-  RegisterForSingleUpdate(afDuration)
-EndEvent
-
-; Called by the swf once the effect ends
-Event FrenzyEnd(string asEventName, string asFrenzyLevel, float afDuration, form akSender)
-  GoToState("")
+  FrenzyStart(asEventName, asFrenzyLevel, afDuration, akSender)
 EndEvent
 
 State Active
+  ; Called by the Papyrus source when the spell is reapplied
+  Event FrenzyStart(string asEventName, string asFrenzyLevel, float afDuration, form akSender)
+    UI.InvokeFloat("HUD Menu", WidgetRoot + ".legacy.updateMeterDuration", afDuration)
+    UI.InvokeFloat("HUD Menu", WidgetRoot + ".main.updateMeterPercent", (asFrenzyLevel as int) * 10)
+  EndEvent
+
+  ; Called by the mod when frenzy ends by any means, including flash event
+  Event FrenzyEnd(string asEventName, string asStringArg, float afNumArg, form akSender)
+		UI.InvokeBool("HUD Menu", WidgetRoot + ".legacy.hide", false)
+		UI.InvokeBool("HUD Menu", WidgetRoot + ".main.hide", false)
+		UI.InvokeFloat("HUD Menu", WidgetRoot + ".main.updateMeterPercent", 0)
+    GoToState("")
+  EndEvent
+
   Event OnMenuOpen(string menuName)
     If(menuName == "HUD MENU")
       SetPaused(false)
@@ -82,3 +84,8 @@ Function SetVisible(bool abVisible)
   UI.SetBool("HUD Menu", WidgetRoot + ".legacy._visible", abVisible)
   UI.SetBool("HUD Menu", WidgetRoot + ".main._visible", abVisible)
 EndFunction
+
+Event FrenzyEnd(string asEventName, string asFrenzyLevel, float afDuration, form akSender)
+EndEvent
+Event FrenzyEndForce(string asEventName, string asStringArg, float afNumArg, form akSender)
+EndEvent

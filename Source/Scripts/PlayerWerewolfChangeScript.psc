@@ -180,7 +180,7 @@ Function CastFrenzy()
   Debug.Trace("[NN] Casting Frenzy")
   If(SKSE.GetPluginVersion("NightmareNight") == -1)
     ; LE compatiblity, using Flash to start the timer
-    SendModEvent("NightmareNightFrenzyStart", numArg = BloodFrenzySpell.GetNthEffectDuration(0))
+    SendModEvent("NightmareNightFrenzyStart", FrenzyStacks.Value, BloodFrenzySpell.GetNthEffectDuration(0))
   EndIf
   BloodFrenzySpell.Cast(Game.GetPlayer())
 EndFunction
@@ -626,6 +626,9 @@ Function ActuallyShiftBackIfNecessary()
 
   ; Reset Frenzy..
   Player.DispelSpell(BloodFrenzySpell)
+  If(SKSE.GetPluginVersion("NightmareNight") == -1)
+    SendModEvent("NightmareNightFrenzyEnd")
+  EndIf
 
   ; make sure the transition armor is gone. We RemoveItem here, because the SetRace stored all equipped items
   ; at that time, and we equip this armor prior to setting the player to a beast race. When we switch back,
