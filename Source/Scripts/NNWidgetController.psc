@@ -13,7 +13,7 @@ Event OnWidgetManagerReady(string asEventName, string asStringArg, float afNumAr
 EndEvent
 
 String Function GetWidgetSource()
-  return "./../../NightmareNight.swf"
+  return "NightmareNight_LEGACY.swf"
 EndFunction
 
 ; called after each Game Reload, so long the dll is NOT installed

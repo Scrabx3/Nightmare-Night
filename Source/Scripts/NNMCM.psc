@@ -1,5 +1,10 @@
 Scriptname NNMCM extends SKI_ConfigBase Conditional
 
+; Sets frenzy meter coordiantes
+Function SetX(float x) native global
+Function SetY(float y) native global
+float[] Function GetCoordinates() native global
+
 Faction Property NightmareNightFaction Auto
 Faction Property WerewolfFaction Auto
 Faction Property WolfFaction Auto
@@ -33,7 +38,6 @@ int Property iNPCTex Auto Hidden
 String[] BearTextures
 int Property BearIndex = 1 Auto Hidden
 ; -- UI
-bool Property bHideMagicka = true Auto Hidden
 ; -- Debug
 String[] Werebeasts
 int iSetRace
@@ -50,14 +54,8 @@ float[] Property Skinwalker Auto Hidden
 Event OnConfigInit()
   RegisterForSingleUpdateGameTime(1)
   Actor Player = Game.GetPlayer()
-
-  ; Set Wolves & Werewolves friendly to our own Faction for Kinship..
   WerewolfFaction.SetAlly(NightmareNightFaction, true, true)
   WolfFaction.SetAlly(NightmareNightFaction, true, true)
-  ; If(Player.HasSpell(WerewolfTransform))
-  ;   Debug.Notification("Wolves and Werewolves are now friendly towards you.")
-  ; EndIf
-
   ; Reset Vanilla Perks..
   int incPerks = 0
   int i = 0
@@ -72,7 +70,6 @@ Event OnConfigInit()
   Game.IncrementStat("NumWerewolfPerks", incPerks)
   WerewolfNextPerk.Value = WerewolfPerks.Value + 5
 
-  ; Setup Menu
   Pages = new String[1]
   Pages[0] = "$NN_pConfig"
 
@@ -129,12 +126,20 @@ Event OnPageReset(string a_page)
   AddHeaderOption("$NN_Cosmetique")
   ; AddMenuOptionST("WerewolfTex", "$NN_WerewolfTex", WolfTextures[WolfIndex]) ; Waiting for Perms on this one
   AddMenuOptionST("WerebearTex", "$NN_WerebearTex", BearTextures[BearIndex])
-  AddEmptyOption()
+  AddEmptyOption()  ; Remove this when adding WW textures
   AddHeaderOption("$NN_UI")
-  AddToggleOptionST("HideMagicka", "$NN_HideMagicka", bHideMagicka)
-  AddEmptyOption()
-  AddEmptyOption()
-  AddEmptyOption()
+  If(DLL())
+    float[] c = GetCoordinates()
+    AddSliderOptionST("CoordsX", "$NN_CoordsX", c[0] * 100, "{2}%")
+    AddSliderOptionST("CoordsY", "$NN_CoordsY", c[1] * 100, "{2}%")
+    AddEmptyOption()
+    AddEmptyOption()
+  Else
+    AddTextOption("$NN_NoDLLUISettings", "", OPTION_FLAG_DISABLED)
+    AddEmptyOption()
+    AddEmptyOption()
+    AddEmptyOption()
+  EndIf
   AddHeaderOption("$NN_Debug")
   AddTextOptionST("TurnWerebeast", "$NN_TurnWerebeast", "")
   AddTextOptionST("CureWerebeast", "$NN_CureWerebeast", "")
@@ -363,17 +368,44 @@ State LunarPreset
 EndState
 
 ; ================= UI
-State HideMagicka
-  Event OnSelectST()
-    bHideMagicka = !bHideMagicka
-    SetToggleOptionValueST(bHideMagicka)
+
+State CoordsX
+  Event OnSliderOpenST()
+    SetSliderDialogStartValue(GetCoordinates()[0])
+    SetSliderDialogDefaultValue(70)
+    SetSliderDialogRange(0, 100)
+    SetSliderDialogInterval(0.05)
+  EndEvent
+  Event OnSliderAcceptST(Float afValue)
+    SetX(afValue / 100)
+    SetSliderOptionValueST(afValue, "{2}%")
   EndEvent
   Event OnDefaultST()
-    bHideMagicka = true
-    SetToggleOptionValueST(bHideMagicka)
+    SetX(70)
+    SetSliderOptionValueST(70)
   EndEvent
   Event OnHighlightST()
-    SetInfoText("$NN_HideMagickaHighlight")
+    SetInfoText("$NN_CoordsXHighlight")
+  EndEvent
+EndState
+
+State CoordsY
+  Event OnSliderOpenST()
+    SetSliderDialogStartValue(GetCoordinates()[1])
+    SetSliderDialogDefaultValue(82)
+    SetSliderDialogRange(0, 100)
+    SetSliderDialogInterval(0.05)
+  EndEvent
+  Event OnSliderAcceptST(Float afValue)
+    SetY(afValue / 100)
+    SetSliderOptionValueST(afValue, "{2}%")
+  EndEvent
+  Event OnDefaultST()
+    SetY(82)
+    SetSliderOptionValueST(82)
+  EndEvent
+  Event OnHighlightST()
+    SetInfoText("$NN_CoordsYHighlight")
   EndEvent
 EndState
 
@@ -488,10 +520,21 @@ Function SetLunarChances(bool abInitialize = false)
   EndIf
 EndFunction
 
+bool Function DLL() global
+  return SKSE.GetPluginVersion("NightmareNight") > -1
+EndFunction
+
 int Function getFlag(bool option)
   If(option)
     return OPTION_FLAG_NONE
   Else
     return OPTION_FLAG_DISABLED
   EndIf
+EndFunction
+
+int Function GetFlagHidden(bool option)
+  If(option)
+    return OPTION_FLAG_HIDDEN
+  EndIf
+  return OPTION_FLAG_NONE
 EndFunction
