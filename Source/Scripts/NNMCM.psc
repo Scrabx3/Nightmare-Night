@@ -12,7 +12,8 @@ Faction Property WolfFaction Auto
 PlayerVampireQuestScript Property VampireQ Auto
 Keyword Property Vampire Auto
 GlobalVariable Property PlayerIsWerewolf Auto ; Vanilla Flag
-GlobalVariable Property IsWerewolf Auto ; Wolf or Bear?
+GlobalVariable Property IsWerewolf Auto       ; Wolf or Bear?
+GlobalVariable Property gSheathedLooting Auto ; loot (dont feed) when claws sheathed?
 Spell Property WerewolfTransform Auto
 Spell Property WerewolfImmunity Auto
 Spell Property CureDiseases Auto
@@ -117,6 +118,7 @@ Event OnPageReset(string a_page)
   SetCursorFillMode(TOP_TO_BOTTOM)
   AddHeaderOption("$NN_General")
   AddToggleOptionST("WolfkinAlliance", "$NN_WolfkinAlliance", bWolfkinAlliance)
+  AddToggleOptionST("SheathedLooting", "$NN_SheathedLooting", gSheathedLooting.GetValue())
   AddToggleOptionST("TurnBackAnimation", "$NN_TurnBackAnimation", bTurnBackAnimation)
   AddToggleOptionST("TurnBackStagger", "$NN_TurnBackStagger", bTurnBackStagger)
   AddToggleOptionST("TurnBackNude", "$NN_TurnBackNude", bTurnBackNude)
@@ -133,10 +135,8 @@ Event OnPageReset(string a_page)
     AddSliderOptionST("CoordsX", "$NN_CoordsX", c[0] * 100, "{2}%")
     AddSliderOptionST("CoordsY", "$NN_CoordsY", c[1] * 100, "{2}%")
     AddEmptyOption()
-    AddEmptyOption()
   Else
     AddTextOption("$NN_NoDLLUISettings", "", OPTION_FLAG_DISABLED)
-    AddEmptyOption()
     AddEmptyOption()
     AddEmptyOption()
   EndIf
@@ -217,6 +217,20 @@ State WolfkinAlliance
   EndEvent
   Event OnHighlightST()
     SetInfoText("$NN_WolfkinAllianceHighlight")
+  EndEvent
+EndState
+
+State SheathedLooting
+  Event OnSelectST()
+    gSheathedLooting.Value = 1 - gSheathedLooting.GetValueInt()
+    SetToggleOptionValueST(gSheathedLooting.Value)
+  EndEvent
+  Event OnDefaultST()
+    gSheathedLooting.Value = 1
+    SetToggleOptionValueST(gSheathedLooting.Value)
+  EndEvent
+  Event OnHighlightST()
+    SetInfoText("$NN_SheathedLootingHighlight")
   EndEvent
 EndState
 
