@@ -9,7 +9,9 @@ Event OnWidgetManagerReady(string asEventName, string asStringArg, float afNumAr
     return
   EndIf
   Debug.Trace("[NIGHTMARE NIGHT] No dll found, loading HUD integrated Widget")
-  parent.OnWidgetManagerReady(asEventName, asStringArg, afNumArg, akSender)
+  Debug.MessageBox("[NIGHTMARE NIGHT] Loading Nightmare Night without its associated dll. This will create issues with frenzy mechanics")
+  ; This doesnt work nd Im admittedly too lazy to fix it
+  ; parent.OnWidgetManagerReady(asEventName, asStringArg, afNumArg, akSender)
 EndEvent
 
 String Function GetWidgetSource()
