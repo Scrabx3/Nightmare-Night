@@ -371,7 +371,7 @@ EndState
 
 State CoordsX
   Event OnSliderOpenST()
-    SetSliderDialogStartValue(GetCoordinates()[0])
+    SetSliderDialogStartValue(GetCoordinates()[0] * 100)
     SetSliderDialogDefaultValue(70)
     SetSliderDialogRange(0, 100)
     SetSliderDialogInterval(0.05)
@@ -391,7 +391,7 @@ EndState
 
 State CoordsY
   Event OnSliderOpenST()
-    SetSliderDialogStartValue(GetCoordinates()[1])
+    SetSliderDialogStartValue(GetCoordinates()[1] * 100)
     SetSliderDialogDefaultValue(82)
     SetSliderDialogRange(0, 100)
     SetSliderDialogInterval(0.05)
