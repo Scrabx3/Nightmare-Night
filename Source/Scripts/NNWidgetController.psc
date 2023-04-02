@@ -1,31 +1,39 @@
 Scriptname NNWidgetController extends SKI_WidgetBase
-{Control Script: Frenzy System}
-
-String Property MagicaAlpha = "_root.HUDMovieBaseInstance.Magica._alpha" AutoReadOnly
+{ Control Script: Frenzy System }
 
 ; legacy support only, abort if the dll is loaded
 Event OnWidgetManagerReady(string asEventName, string asStringArg, float afNumArg, form akSender)
 	If(SKSE.GetPluginVersion("NightmareNight") > -1)
     return
   EndIf
-  Debug.Trace("[NIGHTMARE NIGHT] No dll found, loading HUD integrated Widget")
+  Debug.Trace("[NIGHTMARE NIGHT] OnWidgetManagerReady -> No dll found")
   Debug.MessageBox("[NIGHTMARE NIGHT] Loading Nightmare Night without its associated dll. This will create issues with frenzy mechanics")
-  ; This doesnt work nd Im admittedly too lazy to fix it
-  ; parent.OnWidgetManagerReady(asEventName, asStringArg, afNumArg, akSender)
+
+  ; NOTE: This has scaling issues and Im too lazy to invest large amounts of time into figuering out how to fix it
+  ; if you want to add legacy support for NN, feel free to uncomments and investiage and make PR on my github if you get it to work
+
+  parent.OnWidgetManagerReady(asEventName, asStringArg, afNumArg, akSender)
 EndEvent
 
 String Function GetWidgetSource()
   return "NightmareNight_LEGACY.swf"
 EndFunction
 
-; called after each Game Reload, so long the dll is NOT installed
 Event OnWidgetReset()
+  Parent.OnWidgetReset()
+
   Debug.Trace("[NIGHTMARE NIGHT] On widget reset, loading HUD integrated Widget")
   WidgetName = "Nightmare Night"
   
   RegisterForMenu("HUD MENU")
   RegisterForMenu("ContainerMenu")
   RegisterForMenu("Loading Menu")
+  RegisterForMenu("StatsMenu")
+  RegisterForMenu("Journal Menu")
+  RegisterForMenu("FavoritesMenu")
+  RegisterForMenu("MessageBoxMenu")
+  RegisterForMenu("Console Native UI Menu")
+  RegisterForMenu("Console")
 
   RegisterForModEvent("NightmareNightFrenzyStart", "FrenzyStart")
   RegisterForModEvent("NightmareNightFrenzyEnd", "FrenzyEnd")
