@@ -30,6 +30,7 @@
             <Include>Interface</Include>
             <Include>meshes</Include>
             <Include>Scripts</Include>
+            <Include>SKSE</Include>
             <Include>Source</Include>
             <Include>textures</Include>
         </ZipFile>
