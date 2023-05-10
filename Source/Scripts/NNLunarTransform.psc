@@ -34,18 +34,6 @@ Event OnUpdateGameTime()
   float g = GameHour.Value
   Debug.Trace("NIGHTMARE NIGHT - Update Game Time at = " + g)
 
-  ; float daysPassed = GameDaysPassed.Value
-  ; float hoursTillHunger = ((HungerLastFeed.Value + 1) - daysPassed) * 24
-  ; If(hoursTillHunger <= 0)
-  ;   If(HungerLevel.Value > 0)
-  ;     HungerLevel.Value -= 1
-  ;     ManageHunger()
-  ;   Else
-  ;     HungerFeedings.Value = 0
-  ;   EndIf
-  ;   HungerLastFeed.Value = daysPassed
-  ;   hoursTillHunger = 24
-  ; EndIf
   If(g >= 20.00 || g < 1.00)
     float moonphase = GetMoonphase()
     int moonphaseINT = moonphase as int
@@ -186,6 +174,8 @@ EndState
   • Draugr: Howl of Terror +20 Magnitude & stops affected Enemies from moving until hit once
   • Dragon: Reduce Howl Cooldowns by 20%
 ======================================= /;
+GlobalVariable Property SpiritWolfKills Auto
+
 Function SpawnSpiritPrey()
   If(IsPreySpawned || MCM.bDisableSpirit)
     return
@@ -210,6 +200,18 @@ Function DespawnSpiritPrey()
     i += 1
   EndWhile
   IsPreySpawned = false
+EndFunction
+
+bool wolfProcessing = false
+int Function HandleWolfTakedown()
+  While(wolfProcessing)
+    Utility.Wait(0.2)
+  EndWhile
+  wolfProcessing = true
+  int ret = SpiritWolfKills.GetValueInt() + 1
+  SpiritWolfKills.SetValue(ret)
+  wolfProcessing = false
+  return ret
 EndFunction
 
 ;/ =======================================

@@ -24,6 +24,7 @@ Sound Property NPCDragonDeathSequenceWindMiraak Auto ; This is much shorter than
 Message Property PerkDescriptor Auto
 
 GlobalVariable Property DeathCount Auto
+NNLunarTransform Property Main Auto
 Perk Property SpiritPreyWolfPerk Auto
 int Property Level Auto Hidden
 int maxLv = 5
@@ -42,9 +43,10 @@ EVENT onDYING(ACTOR killer)
 	SetAlpha(0.0, True)
 	
 	If(Level == maxLv)
-		DeathCount.Value += 1
+		; Poor mans attempt to make this thread safe
+		int count = Main.HandleWolfTakedown()
 		; Debug.Trace("NIGHTMARE NIGHT - DEATCH COUNT: " + DeathCount.Value)
-		If(DeathCount.Value == maxDeath)
+		If(count >= maxDeath)
 			; Is the last Wolf that leaves a Corpse behind
 			utility.wait(fDelay)
 			; //attach the ash pile

@@ -1,7 +1,6 @@
 Scriptname NNWidgetController extends SKI_WidgetBase
 { Control Script: Frenzy System }
 
-; legacy support only, abort if the dll is loaded
 Event OnWidgetManagerReady(string asEventName, string asStringArg, float afNumArg, form akSender)
 	If(SKSE.GetPluginVersion("NightmareNight") > -1)
     return
@@ -10,9 +9,9 @@ Event OnWidgetManagerReady(string asEventName, string asStringArg, float afNumAr
   Debug.MessageBox("[NIGHTMARE NIGHT] Loading Nightmare Night without its associated dll. This will create issues with frenzy mechanics")
 
   ; NOTE: This has scaling issues and Im too lazy to invest large amounts of time into figuering out how to fix it
-  ; if you want to add legacy support for NN, feel free to uncomments and investiage and make PR on my github if you get it to work
+  ; if you want to add legacy support for NN, feel free to uncomment and investiage and make PR on my github if you get it to work
 
-  parent.OnWidgetManagerReady(asEventName, asStringArg, afNumArg, akSender)
+  ; parent.OnWidgetManagerReady(asEventName, asStringArg, afNumArg, akSender)
 EndEvent
 
 String Function GetWidgetSource()

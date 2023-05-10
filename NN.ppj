@@ -11,7 +11,7 @@
         <Variable Name="ThisProject" Value="."/>
         <Variable Name="Rel" Value=".\.release"/>
         <Variable Name="MO2" Value=".."/>
-        <Variable Name="Ver" Value="2.0 B2"/>
+        <Variable Name="Ver" Value="2.0"/>
     </Variables>
     <Imports>
         <Import>@ThisProject\Source\Scripts</Import>
@@ -33,13 +33,13 @@
             <Include>Source</Include>
             <Include>textures</Include>
         </ZipFile>
-        <ZipFile Name="@ModName - @Ver - LE" RootDir="@ThisProject" Compression="deflate">
+        <!-- <ZipFile Name="@ModName - @Ver - LE" RootDir="@ThisProject" Compression="deflate">
         	<Include>NightmareNight.esp</Include>
             <Include>Interface</Include>
             <Include Path="meshes/Nightmare Night/werebear">meshesLE</Include>
             <Include>Scripts</Include>
             <Include>Source</Include>
             <Include>textures</Include>
-        </ZipFile>
+        </ZipFile> -->
     </ZipFiles>
 </PapyrusProject>
