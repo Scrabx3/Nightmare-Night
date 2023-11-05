@@ -40,6 +40,7 @@ Event OnDying(Actor akKiller)
       ; Debug.Trace("NIGHTMARE NIGHT: New perk (Feed points " + DLC1WerewolfFeedPoints.Value +", Next perk " + DLC1WerewolfNextPerk.Value + ", Perk pionts " + DLC1WerewolfPerkPoints.value + ")")
     EndIf
   EndIf
+  Game.GetPlayer().SetActorValue("WerewolfPerks", DLC1WerewolfFeedPoints.Value / DLC1WerewolfNextPerk.Value * 100)
 
   ;/ =======================================
     Blood Frenzy is a Buff the Player stacks whenever they kill something
