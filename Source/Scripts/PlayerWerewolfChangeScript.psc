@@ -1,6 +1,9 @@
 Scriptname PlayerWerewolfChangeScript extends Quest  
 {Main Script for Player Werewolf}
 
+int Property INTEGRITY_CHECK = 0 Auto
+{ Set to 1 in the .esp, if this Script or the .esp Quest Object is overriden, accessing this will return 0 }
+
 ; =============================== VANILLA PROPERTIES
 float Property StandardDurationSeconds auto
 {How long (in real seconds) the transformation lasts}
@@ -140,6 +143,7 @@ Race PlayerRace
 ; =============================================================
 ; =============================== FRENZY
 ; =============================================================
+
 Function SetUpFrenzy()
   ; Debug.Trace("[NIGHTMARE NIGHT] Setting up Frenzy")
   If(Game.GetPlayer().HasPerk(Wrath))
@@ -180,7 +184,9 @@ Function CastFrenzy()
   ; Debug.Trace("[NIGHTMARE NIGHT] Casting Frenzy")
   If(SKSE.GetPluginVersion("NightmareNight") == -1)
     ; LE compatiblity, using Flash to start the timer
-    SendModEvent("NightmareNightFrenzyStart", FrenzyStacks.Value, BloodFrenzySpell.GetNthEffectDuration(0))
+    ; SendModEvent("NightmareNightFrenzyStart", FrenzyStacks.Value, BloodFrenzySpell.GetNthEffectDuration(0))
+    Debug.MessageBox("[Nightmare Night]\n\nERROR:\nMissing NightmareNight.dll in your game")
+    return
   EndIf
   BloodFrenzySpell.Cast(Game.GetPlayer())
 EndFunction
@@ -437,8 +443,8 @@ Function StartTracking()
   Else
     regressTime = currentTime + RealTimeSecondsToGameTimeDays(StandardDurationSeconds)
   EndIf
-  Debug.Trace("NIGHTMARE NIGHT - WEREWOLF: currentTime = " + currentTime)
-  Debug.Trace("NIGHTMARE NIGHT - WEREWOLF: regressTime = " + regressTime)
+  ; Debug.Trace("NIGHTMARE NIGHT - WEREWOLF: currentTime = " + currentTime)
+  ; Debug.Trace("NIGHTMARE NIGHT - WEREWOLF: regressTime = " + regressTime)
   PlayerWerewolfShiftBackTime.SetValue(regressTime)
 
   ; increment stats
