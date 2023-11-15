@@ -8,6 +8,7 @@ float[] Function GetCoordinates() native global
 Faction Property NightmareNightFaction Auto
 Faction Property WerewolfFaction Auto
 Faction Property WolfFaction Auto
+Faction Property BearFaction Auto
 
 PlayerVampireQuestScript Property VampireQ Auto
 Keyword Property Vampire Auto
@@ -56,7 +57,7 @@ Event OnConfigInit()
   RegisterForSingleUpdateGameTime(1)
   Actor Player = Game.GetPlayer()
   WerewolfFaction.SetAlly(NightmareNightFaction, true, true)
-  WolfFaction.SetAlly(NightmareNightFaction, true, true)
+  UpdateAlliance()
   ; Reset Vanilla Perks..
   int incPerks = 0
   int i = 0
@@ -209,10 +210,12 @@ EndEvent
 State WolfkinAlliance
   Event OnSelectST()
     bWolfkinAlliance = !bWolfkinAlliance
+    UpdateAlliance()
     SetToggleOptionValueST(bWolfkinAlliance)
   EndEvent
   Event OnDefaultST()
     bWolfkinAlliance = false
+    UpdateAlliance()
     SetToggleOptionValueST(bWolfkinAlliance)
   EndEvent
   Event OnHighlightST()
@@ -464,6 +467,19 @@ EndState
 ; =============================================================
 ; =============================== UTILITY & MISC
 ; =============================================================
+Function UpdateAlliance()
+  If (bWolfkinAlliance)
+    If (IsWerewolf.GetValue() == 1)
+      WolfFaction.SetAlly(NightmareNightFaction, true, true)
+    Else
+      BearFaction.SetAlly(NightmareNightFaction, true, true)
+    EndIf
+  Else
+    WolfFaction.SetEnemy(NightmareNightFaction, true, true)
+    BearFaction.SetEnemy(NightmareNightFaction, true, true)
+  EndIf  
+EndFunction
+
 Function TurnWerebeast()
   Actor pl = Game.GetPlayer()
 

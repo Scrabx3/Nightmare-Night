@@ -1,8 +1,10 @@
 Scriptname NNFactionController extends ActiveMagicEffect  
 
+NNMCM Property MCM Auto
 Faction Property NightmareNightFaction Auto
 
 Event OnEffectStart(Actor akTarget, Actor akCaster)
+  MCM.UpdateAlliance()
   akTarget.AddToFaction(NightmareNightFaction)
 EndEvent
 
