@@ -140,6 +140,8 @@ Form WerebeastFXArmor
 Form Property TransitionArmor Auto Hidden
 Race PlayerRace
 
+Keyword SLActive
+
 ; =============================================================
 ; =============================== FRENZY
 ; =============================================================
@@ -276,6 +278,9 @@ Function PrepShift()
 
   ; Disable Magicka Bar
   UI.SetNumber("HUD Menu", "_root.HUDMovieBaseInstance.Magica._alpha", 0)
+
+  ; Misc stuff
+  SLActive = Keyword.GetKeyword("SexLabActive")
 EndFunction
 
 ; Called from Stage1 (e.g. when Transform Script completes)
@@ -470,7 +475,9 @@ Event OnUpdate()
   EndIf
 
   Actor Player = Game.GetPlayer()
-  If(Player.HasPerk(Wrath) && Player.HasMagicEffect(BloodFrenzyEffect))
+  If (Player.HasPerk(Wrath) && Player.HasMagicEffect(BloodFrenzyEffect))
+    return
+  ElseIf (SLActive && Player.HasKeyword(SLActive))
     return
   EndIf
 
