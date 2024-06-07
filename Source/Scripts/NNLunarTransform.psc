@@ -24,6 +24,10 @@ GlobalVariable Property WolfKillCount Auto
 bool Property LunarTransform Auto Hidden
 bool IsPreySpawned = false
 
+Race Function GetWerebearRace() global
+  return Game.GetForm(0x0401E17B) as Race
+EndFunction
+
 Event OnUpdateGameTime()
   If(Game.GetPlayer().HasSpell(MCM.WerewolfImmunity) == false)
     ; Nothing to do if the Player isnt a Werebeast
