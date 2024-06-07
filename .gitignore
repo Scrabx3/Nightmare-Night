@@ -3,3 +3,4 @@ meta.ini
 .vscode
 *.code-workspace
 *.dll
+*.pdb
