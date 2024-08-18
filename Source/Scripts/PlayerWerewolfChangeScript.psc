@@ -312,11 +312,11 @@ Function StartTracking()
   ; Game.GetPlayer().RemoveAllItems(LycanStash)
   Player.UnequipAll()
   If(IsWerewolf.Value == 1)
-    ; If(Lunar.MCM.WolfIndex)
-    ;   WerebeastFXArmor = BearFXArmorList.GetAt(Lunar.MCM.WolfIndex - 1)
-    ; Else
+    If(Lunar.MCM.WolfIndex)
+      WerebeastFXArmor = WolfFXArmorList.GetAt(Lunar.MCM.WolfIndex - 1)
+    Else
       WerebeastFXArmor = WolfSkinFXArmor
-    ; EndIf
+    EndIf
   Else
     If(Lunar.MCM.BearIndex)
       WerebeastFXArmor = BearFXArmorList.GetAt(Lunar.MCM.BearIndex - 1)

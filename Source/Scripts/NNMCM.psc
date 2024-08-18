@@ -35,8 +35,8 @@ GlobalVariable Property gDisableHunters Auto
 String[] NPCTextures
 int Property iNPCTex Auto Hidden
 ; -- Cosmetique
-; String[] WolfTextures
-; int Property WolfIndex = 0 Auto Hidden
+String[] WolfTextures
+int Property WolfIndex = 0 Auto Hidden
 String[] BearTextures
 int Property BearIndex = 1 Auto Hidden
 ; -- UI
@@ -85,6 +85,13 @@ Event OnConfigInit()
   Werebeasts[0] = "$NN_Wererace_0" ; Werewolf
   Werebeasts[1] = "$NN_Wererace_1" ; Werebear
 
+  WolfTextures = new String[14]
+  int k = 0
+  While (k < WolfTextures.Length)
+    WolfTextures[k] = "$NN_WerewolfTex_" + k
+    k += 1
+  EndWhile
+
   BearTextures = new String[15]
   int s = 0
   While(s < BearTextures.Length)
@@ -127,7 +134,7 @@ Event OnPageReset(string a_page)
   AddToggleOptionST("EnableHunters", "$NN_Hunters", gDisableHunters.Value)
   AddToggleOptionST("DisableSpiritPrey", "$NN_SpiritDisable", bDisableSpirit)
   AddHeaderOption("$NN_Cosmetique")
-  ; AddMenuOptionST("WerewolfTex", "$NN_WerewolfTex", WolfTextures[WolfIndex]) ; Waiting for Perms on this one
+  AddMenuOptionST("WerewolfTex", "$NN_WerewolfTex", WolfTextures[WolfIndex])
   AddMenuOptionST("WerebearTex", "$NN_WerebearTex", BearTextures[BearIndex])
   AddEmptyOption()  ; Remove this when adding WW textures
   AddHeaderOption("$NN_UI")
@@ -329,6 +336,26 @@ State NPCTex
 EndState
 
 ; ================= Cosmetique
+
+State WerewolfTex
+  Event OnMenuOpenST()
+    SetMenuDialogStartIndex(WolfIndex)
+    SetMenuDialogDefaultIndex(1)
+    SetMenuDialogOptions(WolfTextures)
+  EndEvent
+  Event OnMenuAcceptST(Int aiIndex)
+    WolfIndex = aiIndex
+    SetMenuOptionValueST(WolfTextures[WolfIndex])
+  EndEvent
+  Event OnDefaultST()
+    WolfIndex = 1
+    SetMenuOptionValueST(WolfTextures[WolfIndex])
+  EndEvent
+  Event OnHighlightST()
+    SetInfoText("$NN_WerewolfTexHighlight")
+  EndEvent
+EndState
+
 State WerebearTex
   Event OnMenuOpenST()
     SetMenuDialogStartIndex(BearIndex)

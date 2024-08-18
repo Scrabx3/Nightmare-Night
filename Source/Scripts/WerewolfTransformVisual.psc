@@ -23,14 +23,14 @@ Event OnEffectStart(Actor Target, Actor Caster)
   if (Target.GetActorBase().GetRace() != WerewolfRace)
 		; Add the tranformation wolf skin Armor effect 
 		If(MCM.IsWerewolf.Value == 1)
-			; If(MCM.WolfIndex == 0) ; Vanilla
+			If(MCM.WolfIndex == 0) ; Vanilla
 				Target.equipitem(WolfSkinFXArmor,False,True)
 				equippedFX = WolfSkinFXArmor
-			; Else
-			; 	Form skinFXArmor = WerewolfSkinFXs.GetAt(MCM.WolfIndex - 1)
-			; 	Target.equipitem(skinFXArmor,False,True)
-			; 	equippedFX = skinFXArmor
-			; EndIf
+			Else
+				Form skinFXArmor = WerewolfSkinFXs.GetAt(MCM.WolfIndex - 1)
+				Target.equipitem(skinFXArmor,False,True)
+				equippedFX = skinFXArmor
+			EndIf
 		Else
 			If(MCM.BearIndex == 0) ; Vanilla
 				Target.equipitem(WolfSkinFXArmor,False,True)
