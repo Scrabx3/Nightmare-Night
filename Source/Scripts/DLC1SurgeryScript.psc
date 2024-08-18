@@ -93,7 +93,7 @@ endFunction
 bool function CanUseFaceMenu()
 	Actor thePlayer = Game.GetPlayer()
   Race PlayerRace = thePlayer.GetRace()
-	if PlayerRace == WerewolfBeastRace || thePlayer.HasKeyword(Vampire) || thePlayer.HasMagicEffect(WerewolfChangeEffect) || thePlayer.HasMagicEffect(WerewolfChangeFXEffect) || PlayerRace == DLC2WerebearRace
+	if PlayerRace == WerewolfBeastRace || thePlayer.HasKeyword(Vampire) || thePlayer.HasMagicEffect(WerewolfChangeEffect) || thePlayer.HasMagicEffect(WerewolfChangeFXEffect) || PlayerRace == NNLunarTransform.GetWerebearRace()
 		; enable controls since we're bailing
 		Game.EnablePlayerControls()
 		return false
@@ -107,5 +107,3 @@ Race Property WerewolfBeastRace Auto
 Keyword Property Vampire Auto
 MagicEffect Property WerewolfChangeEffect Auto
 MagicEffect Property WerewolfChangeFXEffect Auto
-
-Race Property DLC2WerebearRace Auto

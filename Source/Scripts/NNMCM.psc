@@ -136,7 +136,6 @@ Event OnPageReset(string a_page)
   AddHeaderOption("$NN_Cosmetique")
   AddMenuOptionST("WerewolfTex", "$NN_WerewolfTex", WolfTextures[WolfIndex])
   AddMenuOptionST("WerebearTex", "$NN_WerebearTex", BearTextures[BearIndex])
-  AddEmptyOption()  ; Remove this when adding WW textures
   AddHeaderOption("$NN_UI")
   If(DLL())
     float[] c = GetCoordinates()
@@ -570,8 +569,9 @@ Function SetLunarChances(bool abInitialize = false)
     int i = 0
     While(i < LunarChances.Length)
       String l = "LunarChance_" + i
-      SetOptionFlagsST(flag, i != 7, l)
-      SetSliderOptionValueST(LunarChances[i], "{1}%", i != 7, l)
+      bool noUpdate = i < LunarChances.Length - 1
+      SetOptionFlagsST(flag, noUpdate, l)
+      SetSliderOptionValueST(LunarChances[i], "{1}%", noUpdate, l)
       i += 1
     EndWhile
   EndIf

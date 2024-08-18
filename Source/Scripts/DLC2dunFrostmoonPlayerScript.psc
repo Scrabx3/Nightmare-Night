@@ -22,8 +22,6 @@ Actor player
 Race property WerewolfBeastRace Auto
 bool hasEnteredWerewolfForm
 
-Race Property DLC2WerebearRace Auto
-
 Event OnSpellCast(Form akSpell)
 	if ((akSpell == WerewolfChange) || (akSpell == WerewolfChangeRingOfHircine))
 ; 		;Debug.Trace("Werewolf Transformation with Global: " + DLC2dunFrostmoonCurrentRing.GetValueInt())
@@ -47,20 +45,21 @@ Event OnUpdate()
 	EndIf
 	
 	Race PlayerRace = player.GetRace()
+	Race Werebear = NNLunarTransform.GetWerebearRace()
 	;If the player is not yet in Beast Form, just re-register.
-	if ((PlayerRace != WerewolfBeastRace) && PlayerRace != DLC2WerebearRace && !hasEnteredWerewolfForm)
+	if ((PlayerRace != WerewolfBeastRace) && PlayerRace != Werebear && !hasEnteredWerewolfForm)
 ; 		;Debug.Trace("A")
 		RegisterForSingleUpdate(1)
 		
 	;If the player has just entered Beast Form, apply the ring effect, then re-register.
-	ElseIf ((PlayerRace == WerewolfBeastRace) && PlayerRace != DLC2WerebearRace && !hasEnteredWerewolfForm)
+	ElseIf ((PlayerRace == WerewolfBeastRace) && PlayerRace != Werebear && !hasEnteredWerewolfForm)
 ; 		;Debug.Trace("B")
 		hasEnteredWerewolfForm = True
 		ApplyRingEffect()
 		RegisterForSingleUpdate(1)
 	
 	;While the player remains in Beast Form, re-register.
-	ElseIf ((PlayerRace == WerewolfBeastRace) && PlayerRace != DLC2WerebearRace && hasEnteredWerewolfForm)
+	ElseIf ((PlayerRace == WerewolfBeastRace) && PlayerRace != Werebear && hasEnteredWerewolfForm)
 ; 		;Debug.Trace("C")
 		RegisterForSingleUpdate(1)
 	

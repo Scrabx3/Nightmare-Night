@@ -125,6 +125,9 @@ Perk Property Wrath Auto
 Perk Property NightmareNight Auto
 
 GlobalVariable Property FrenzyStacks Auto
+GlobalVariable Property DefPenalty Auto
+GlobalVariable Property AtkBonus Auto
+GlobalVariable Property SpdBonus Auto
 MagicEffect Property BloodFrenzyEffect Auto
 Spell Property BloodFrenzySpell Auto
 Perk Property BloodFrenzyPerk Auto
@@ -171,9 +174,9 @@ EndFunction
 Function SetFrenzyStats(int aiLevel)
   ; Debug.Trace("[NIGHTMARE NIGHT] Setting Frenzy to Level " + aiLevel)
   int ww = IsWerewolf.GetValueInt()
-  float dmg = (0.1 - 0.025 * ww) * aiLevel
-  float spd = (0.025 + 0.035 * ww) * aiLevel
-  float def = 0.05 * aiLevel
+  float dmg = (AtkBonus.Value * (1 - 0.25 * ww)) * aiLevel
+  float spd = (SpdBonus.Value * (1 + 1.40 * ww)) * aiLevel
+  float def = DefPenalty.Value * aiLevel
   ; Debug.Trace("[NIGHTMARE NIGHT] - Blood Frenzy Stats Update - damage = " + dmg + "; speed = " + spd + "; defense = " + def)
 
   BloodFrenzyPerk.SetNthEntryValue(0, 1, dmg) ; Damage

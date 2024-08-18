@@ -100,7 +100,7 @@ Event OnUpdateGameTime()
 
   Actor Player = Game.GetPlayer()
   Race PlayerRace = Game.GetPlayer().GetRace()
-	if (Player.IsEquipped(CursedRing) && PlayerRace != WerewolfBeastRace && PlayerRace != DLC2WerebearRace)
+	if (Player.IsEquipped(CursedRing) && PlayerRace != WerewolfBeastRace && PlayerRace != NNLunarTransform.GetWerebearRace())
 ; 		Debug.Trace("DA05: Cursed ring trying to act...")
 		if (!Player.IsInInterior())
 			if (Player.GetWorldSpace() != BloatedMansGrotto)
@@ -118,5 +118,3 @@ Event OnUpdateGameTime()
 		endif
 	endif
 EndEvent
-
-Race Property DLC2WerebearRace Auto

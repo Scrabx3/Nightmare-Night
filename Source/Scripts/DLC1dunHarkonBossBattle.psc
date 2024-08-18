@@ -134,8 +134,6 @@ MusicType property MUSCombatBoss Auto
 Race property VampireBeastRace Auto
 Race property WerewolfBeastRace Auto
 
-Race Property DLC2WerebearRace Auto
-
 ;--------------------------------------------------------------
 ;Main Battle Loops: OnHit and OnUpdate
 ;---------------------------------------
@@ -299,7 +297,7 @@ Function ProcessOnUpdateOROnHitEvent(ObjectReference aggressor, Form weap)
 			ShrineEventSceneTimer = currentTime
 		ElseIf (currentTime - ShrineEventSceneTimer > 15 && !DLC1VQ08HarkonBattleScene.IsPlaying() && PlayerHasAurielsBow)
 			Race playerRace = Game.GetPlayer().GetRace()
-			if ((VampireBeastRace == None || VampireBeastRace != playerRace) && (WerewolfBeastRace == None || WerewolfBeastRace != playerRace) && DLC2WerebearRace != PlayerRace)
+			if ((VampireBeastRace == None || VampireBeastRace != playerRace) && (WerewolfBeastRace == None || WerewolfBeastRace != playerRace) && NNLunarTransform.GetWerebearRace() != PlayerRace)
 				if (SelfActor.GetAV("Variable09") == 0)
 					SelfActor.SetAV("Variable09", 1)
 				EndIf
