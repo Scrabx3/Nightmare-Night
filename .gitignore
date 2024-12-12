@@ -4,3 +4,4 @@ meta.ini
 *.code-workspace
 *.dll
 *.pdb
+*.pex
