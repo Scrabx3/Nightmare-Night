@@ -16,13 +16,13 @@ Function Fragment_4(ObjectReference akTargetRef, Actor akActor)
 ; Stop the Player from Lockpicking or apply the
 ; "Break Entry" Perk if possible
 float lockLevel = akTargetRef.GetLockLevel() + 45.0
-Debug.Trace("NIGHTMARE NIGHT - BREAK ENTRY -> locklevel = " + lockLevel)
+; Debug.Trace("NIGHTMARE NIGHT - BREAK ENTRY -> locklevel = " + lockLevel)
 If(lockLevel == 300)
   Debug.Notification("This Lock cannot be broken")
 EndIf
 float stamina = akActor.GetActorValue("Stamina")
 float payment = lockLevel/299.0 * akActor.GetActorValueMax("Stamina")
-Debug.Trace("NIGHTMARE NIGHT - BREAK ENTRY -> stamina = " + stamina + " // payment = " + payment)
+; Debug.Trace("NIGHTMARE NIGHT - BREAK ENTRY -> stamina = " + stamina + " // payment = " + payment)
 If(stamina < payment)
   Debug.Notification("You don't have enough Stamina to break this Lock open")
 Else
