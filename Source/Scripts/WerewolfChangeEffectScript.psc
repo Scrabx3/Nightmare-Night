@@ -25,22 +25,22 @@ Spell Property VFXSpell auto
 ;=============/
 
 Event OnEffectStart(Actor Target, Actor Caster)
-	;	Debug.Trace("WEREWOLF: Casting transformation spell on " + Target)
-
+	; Debug.Trace("WEREWOLF: Casting transformation spell on " + Target)
 	; set up tracking
 	if (Target == Game.GetPlayer())
 		; Debug.Trace("WEREWOLF: Target is player.")
 		; if this is the first time, don't actually do anything (transform handled in rampage script)
-		if ( (C00 as CompanionsHousekeepingScript).PlayerIsWerewolfVirgin )
-			;	Debug.Trace("WEREWOLF: Player's first time; bailing out.")
-			(C00 as CompanionsHousekeepingScript).PlayerIsWerewolfVirgin = false
+		CompanionsHousekeepingScript scr = C00 as CompanionsHousekeepingScript
+		int stage = scr.C03.GetCurrentStageID()
+		if (scr.PlayerIsWerewolfVirgin && stage >= 15 && stage < 25)
+			; Debug.Trace("WEREWOLF: Player's first time; bailing out.")
+			scr.PlayerIsWerewolfVirgin = false
 			Game.SetBeastForm(False)
 			return
 		endif
 		; Debug.Trace("WEREWOLF: Starting player tracking.")
 		PlayerWerewolfQuest.Start()
 	endif
-
 	; the Spell castet here calls the "WerewolfTransformVisual" Script for the second part of the Transformation
 	VFXSpell.Cast(Target)
 EndEvent

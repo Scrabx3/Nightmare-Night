@@ -21,27 +21,27 @@ Event OnEffectStart(Actor Target, Actor Caster)
 	; Debug.Trace("WEREWOLF: Starting change anim...")
 
   if (Target.GetActorBase().GetRace() != WerewolfRace)
-		; Add the tranformation wolf skin Armor effect 
-		If(MCM.IsWerewolf.Value == 1)
-			If(MCM.WolfIndex == 0) ; Vanilla
-				Target.equipitem(WolfSkinFXArmor,False,True)
-				equippedFX = WolfSkinFXArmor
-			Else
-				Form skinFXArmor = WerewolfSkinFXs.GetAt(MCM.WolfIndex - 1)
-				Target.equipitem(skinFXArmor,False,True)
-				equippedFX = skinFXArmor
-			EndIf
+	; Add the tranformation wolf skin Armor effect 
+	If(MCM.IsWerewolf.Value == 1)
+		If(MCM.WolfIndex == 0) ; Vanilla
+			Target.equipitem(WolfSkinFXArmor,False,True)
+			equippedFX = WolfSkinFXArmor
 		Else
-			If(MCM.BearIndex == 0) ; Vanilla
-				Target.equipitem(WolfSkinFXArmor,False,True)
-				equippedFX = WolfSkinFXArmor
-			Else
-				Form skinFXArmor = WerebearSkinFXs.GetAt(MCM.BearIndex - 1)
-				Target.equipitem(skinFXArmor,False,True)
-				equippedFX = skinFXArmor
-			EndIf
+			Form skinFXArmor = WerewolfSkinFXs.GetAt(MCM.WolfIndex - 1)
+			Target.equipitem(skinFXArmor,False,True)
+			equippedFX = skinFXArmor
 		EndIf
-		RegisterForAnimationEvent(Target, "SetRace")
+	Else
+		If(MCM.BearIndex == 0) ; Vanilla
+			Target.equipitem(WolfSkinFXArmor,False,True)
+			equippedFX = WolfSkinFXArmor
+		Else
+			Form skinFXArmor = WerebearSkinFXs.GetAt(MCM.BearIndex - 1)
+			Target.equipitem(skinFXArmor,False,True)
+			equippedFX = skinFXArmor
+		EndIf
+	EndIf
+	RegisterForAnimationEvent(Target, "SetRace")
     Target.PlayIdle(IdleWerewolfTransformation)
     Utility.Wait(10)
     TransformIfNecessary(Target)
@@ -64,7 +64,7 @@ Function TransformIfNecessary(Actor Target)
 
 	Race currRace = Target.GetRace()
 	if (currRace != WerewolfRace)
-		Debug.Trace("WEREWOLF: VISUAL: Setting race " + WerewolfRace + " on " + Target)
+		; Debug.Trace("WEREWOLF: VISUAL: Setting race " + WerewolfRace + " on " + Target)
 		if (Target != Game.GetPlayer())
 			; Debug.Trace("WEREWOLF: VISUAL: Target is not player, doing the transition here.")
 			Target.SetRace(WerewolfRace) ;TEEN WOLF
@@ -80,8 +80,8 @@ Function TransformIfNecessary(Actor Target)
 			endif
 			PlayerWerewolfQuest.SetStage(1)
 			WWQ.TransitionArmor = equippedFX
-    endif
-  endif
+    	endif
+  	endif
 EndFunction
 
 
