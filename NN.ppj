@@ -25,7 +25,7 @@
         <Folder>@ThisProject\Source\Scripts</Folder>
     </Folders>
     <ZipFiles Output="@Rel">
-        <ZipFile Name="@ModName - @Ver - 1.6.1170" RootDir="@ThisProject" Compression="deflate">
+        <ZipFile Name="@ModName - @Ver" RootDir="@ThisProject" Compression="deflate">
         	<Include>NightmareNight.esp</Include>
             <Include>Interface</Include>
             <Include>meshes</Include>
